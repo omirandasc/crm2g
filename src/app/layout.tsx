@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
-import { Figtree, Geist_Mono } from "next/font/google";
+import { Poppins, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { ProvedorTema } from "@/components/provedor-tema";
 
-const figtree = Figtree({
+const poppins = Poppins({
   subsets: ["latin"],
-  variable: "--font-figtree",
+  variable: "--font-poppins",
+  weight: ["400", "500", "600", "700"],
 });
 
 const geistMono = Geist_Mono({
@@ -21,9 +23,9 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="pt-BR">
-      <body className={`${figtree.variable} ${geistMono.variable} font-sans`}>
-        {children}
+    <html lang="pt-BR" suppressHydrationWarning>
+      <body className={`${poppins.variable} ${geistMono.variable} font-sans`}>
+        <ProvedorTema>{children}</ProvedorTema>
       </body>
     </html>
   );

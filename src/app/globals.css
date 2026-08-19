@@ -5,47 +5,48 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  /* Paleta CRM DOISGE — linguagem monday.com: clara, azul de ação, status coloridos */
-  --color-papel: #f6f7fb;
-  --color-cartao: #ffffff;
-  --color-tinta: #323338;
-  --color-tinta-suave: #676879;
-  --color-tinta-fraca: #9699a6;
-  --color-linha: #d0d4e4;
-  --color-linha-forte: #c3c6d4;
-
-  --color-marca-50: #e5f4ff;
-  --color-marca-100: #cce5ff;
-  --color-marca-200: #a3cdff;
-  --color-marca-600: #0073ea;
-  --color-marca-700: #0060b9;
-  --color-marca-800: #004e95;
-  --color-marca-900: #003d75;
-  --color-marca-950: #292f4c;
-
-  /* Linguagem de território — etiquetas sólidas estilo monday */
-  --color-livre: #7b7e8c;
-  --color-livre-fundo: #eceef5;
-  --color-preferencial: #f0930d;
-  --color-preferencial-fundo: #fdf0dc;
-  --color-exclusiva: #00a25b;
-  --color-exclusiva-fundo: #d9f5e8;
-
-  --color-sucesso: #00a25b;
-  --color-sucesso-fundo: #d9f5e8;
-  --color-alerta: #c07907;
-  --color-alerta-fundo: #fdf0dc;
-  --color-erro: #d83a52;
-  --color-erro-fundo: #fbe5e8;
-
-  --shadow-cartao: 0 1px 2px rgb(41 47 76 / 0.06);
+  /* Escala da marca — verde-limão vibrante (linguagem "fintech premium") */
+  --color-marca-50: #f4fbe8;
+  --color-marca-100: #e6f7c9;
+  --color-marca-200: #cdee95;
+  --color-marca-600: #65b511;
+  --color-marca-700: #52930e;
+  --color-marca-800: #40720c;
+  --color-marca-900: #2f540a;
+  --color-marca-950: #182b06;
 }
 
 @theme inline {
-  --font-heading: var(--font-figtree), system-ui, sans-serif;
-  --font-display: var(--font-figtree), system-ui, sans-serif;
-  --font-sans: var(--font-figtree), system-ui, sans-serif;
+  --font-heading: var(--font-poppins), system-ui, sans-serif;
+  --font-display: var(--font-poppins), system-ui, sans-serif;
+  --font-sans: var(--font-poppins), system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  /* Aliases herdados do app mapeados aos tokens do tema */
+  --color-papel: var(--background);
+  --color-cartao: var(--card);
+  --color-tinta: var(--foreground);
+  --color-tinta-suave: var(--muted-foreground);
+  --color-tinta-fraca: var(--t-fraca);
+  --color-linha: var(--border);
+  --color-linha-forte: var(--input);
+
+  /* Linguagem de território e tons semânticos (por tema) */
+  --color-livre: var(--t-livre);
+  --color-livre-fundo: var(--t-livre-fundo);
+  --color-preferencial: var(--t-preferencial);
+  --color-preferencial-fundo: var(--t-preferencial-fundo);
+  --color-exclusiva: var(--t-exclusiva);
+  --color-exclusiva-fundo: var(--t-exclusiva-fundo);
+  --color-sucesso: var(--t-sucesso);
+  --color-sucesso-fundo: var(--t-sucesso-fundo);
+  --color-alerta: var(--t-alerta);
+  --color-alerta-fundo: var(--t-alerta-fundo);
+  --color-erro: var(--t-erro);
+  --color-erro-fundo: var(--t-erro-fundo);
+
+  --shadow-cartao: var(--sombra-cartao);
+
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -86,75 +87,112 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+/* ── Tema claro ─────────────────────────────────────────────────── */
 :root {
-  /* Tokens shadcn — visual monday.com */
-  --background: #ffffff;
-  --foreground: #323338;
+  --background: #f4f5f2;
+  --foreground: #16180f;
   --card: #ffffff;
-  --card-foreground: #323338;
+  --card-foreground: #16180f;
   --popover: #ffffff;
-  --popover-foreground: #323338;
-  --primary: #0073ea;
-  --primary-foreground: #ffffff;
-  --secondary: #eceef5;
-  --secondary-foreground: #323338;
-  --muted: #f6f7fb;
-  --muted-foreground: #676879;
-  --accent: #e5f4ff;
-  --accent-foreground: #0060b9;
-  --destructive: #d83a52;
-  --border: #d0d4e4;
-  --input: #c3c6d4;
-  --ring: #0073ea;
-  --chart-1: #0073ea;
-  --chart-2: #00c875;
-  --chart-3: #fdab3d;
-  --chart-4: #a25ddc;
-  --chart-5: #e2445c;
-  --radius: 0.5rem;
-  --sidebar: #f6f7fb;
-  --sidebar-foreground: #52545f;
-  --sidebar-primary: #0073ea;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #cce5ff;
-  --sidebar-accent-foreground: #323338;
-  --sidebar-border: #d0d4e4;
-  --sidebar-ring: #0073ea;
+  --popover-foreground: #16180f;
+  --primary: #191b12;
+  --primary-foreground: #fafaf7;
+  --secondary: #edf0e6;
+  --secondary-foreground: #2a2e1e;
+  --muted: #eef0ea;
+  --muted-foreground: #6d7365;
+  --accent: #ecf7da;
+  --accent-foreground: #3c6b0d;
+  --destructive: #d6453f;
+  --border: #e3e6dd;
+  --input: #d3d8ca;
+  --ring: #65b511;
+  --chart-1: #6fc317;
+  --chart-2: #4f9cf7;
+  --chart-3: #f0a219;
+  --chart-4: #8a9083;
+  --chart-5: #ef5f57;
+  --radius: 1rem;
+  --sidebar: #fafbf7;
+  --sidebar-foreground: #565c4d;
+  --sidebar-primary: #191b12;
+  --sidebar-primary-foreground: #fafaf7;
+  --sidebar-accent: #e7f5cd;
+  --sidebar-accent-foreground: #2f540a;
+  --sidebar-border: #e3e6dd;
+  --sidebar-ring: #65b511;
+
+  --t-fraca: #9aa091;
+  --t-livre: #797f70;
+  --t-livre-fundo: #edefe8;
+  --t-preferencial: #ef940b;
+  --t-preferencial-fundo: #fdf2dc;
+  --t-exclusiva: #5aa80f;
+  --t-exclusiva-fundo: #e9f6d2;
+  --t-sucesso: #4d8b0d;
+  --t-sucesso-fundo: #e9f6d2;
+  --t-alerta: #b16a05;
+  --t-alerta-fundo: #fdf2dc;
+  --t-erro: #d6453f;
+  --t-erro-fundo: #fde9e7;
+
+  --sombra-cartao: 0 1px 2px rgb(22 24 15 / 0.05);
 }
 
+/* ── Tema escuro (padrão) ───────────────────────────────────────── */
 .dark {
-  --background: #181b34;
-  --foreground: #eceef5;
-  --card: #202443;
-  --card-foreground: #eceef5;
-  --popover: #202443;
-  --popover-foreground: #eceef5;
-  --primary: #4da6ff;
-  --primary-foreground: #10132a;
-  --secondary: #2a2e52;
-  --secondary-foreground: #eceef5;
-  --muted: #2a2e52;
-  --muted-foreground: #9ba0b5;
-  --accent: #1f3a5f;
-  --accent-foreground: #a3cdff;
-  --destructive: #ef5e75;
-  --border: rgb(255 255 255 / 0.12);
-  --input: rgb(255 255 255 / 0.16);
-  --ring: #4da6ff;
-  --chart-1: #4da6ff;
-  --chart-2: #00c875;
-  --chart-3: #fdab3d;
-  --chart-4: #a25ddc;
-  --chart-5: #e2445c;
-  --sidebar: #10132a;
-  --sidebar-foreground: #c8ccdd;
-  --sidebar-primary: #4da6ff;
-  --sidebar-primary-foreground: #10132a;
-  --sidebar-accent: #1f3a5f;
-  --sidebar-accent-foreground: #eceef5;
-  --sidebar-border: rgb(255 255 255 / 0.12);
-  --sidebar-ring: #4da6ff;
+  --background: #0b0c0a;
+  --foreground: #f2f4ee;
+  --card: #141613;
+  --card-foreground: #f2f4ee;
+  --popover: #191b17;
+  --popover-foreground: #f2f4ee;
+  --primary: #f2f4ee;
+  --primary-foreground: #131510;
+  --secondary: #21241d;
+  --secondary-foreground: #e4e8dc;
+  --muted: #1c1f1a;
+  --muted-foreground: #9aa190;
+  --accent: #1f2a13;
+  --accent-foreground: #c4ee85;
+  --destructive: #f4665e;
+  --border: rgb(255 255 255 / 0.08);
+  --input: rgb(255 255 255 / 0.13);
+  --ring: #8fd944;
+  --chart-1: #8fe045;
+  --chart-2: #6db2ff;
+  --chart-3: #f5b342;
+  --chart-4: #8a9083;
+  --chart-5: #f4665e;
+  --sidebar: #0f110e;
+  --sidebar-foreground: #aab19f;
+  --sidebar-primary: #f2f4ee;
+  --sidebar-primary-foreground: #131510;
+  --sidebar-accent: #1f2a13;
+  --sidebar-accent-foreground: #d3f59b;
+  --sidebar-border: rgb(255 255 255 / 0.07);
+  --sidebar-ring: #8fd944;
+
+  --t-fraca: #6f7566;
+  --t-livre: #6d7365;
+  --t-livre-fundo: #22251f;
+  --t-preferencial: #f5a623;
+  --t-preferencial-fundo: #2e230e;
+  --t-exclusiva: #7ed321;
+  --t-exclusiva-fundo: #1d2a0e;
+  --t-sucesso: #8fe045;
+  --t-sucesso-fundo: #1d2a0e;
+  --t-alerta: #f5b342;
+  --t-alerta-fundo: #2e230e;
+  --t-erro: #f4665e;
+  --t-erro-fundo: #2e1210;
+  --sombra-cartao: 0 1px 2px rgb(0 0 0 / 0.4);
 }
+
+/* Selos sólidos de território precisam de contraste em ambos os temas */
+.dark .bg-livre { color: #0d0f0c; }
+.dark .bg-preferencial { color: #1c1405; }
+.dark .bg-exclusiva { color: #101c05; }
 
 @layer base {
   * {
@@ -167,10 +205,7 @@
     letter-spacing: -0.01em;
   }
   ::selection {
-    background-color: var(--color-marca-100);
+    background-color: var(--color-marca-200);
+    color: #182b06;
   }
 }
-
-/* Observação: não zerar durações globalmente — o Base UI espera o fim da
-   transição para desmontar diálogos, e durações forçadas a ~0 travam o
-   fechamento quando prefers-reduced-motion está ativo. */

@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { Sidebar } from "@/components/sidebar";
 import { BuscaGlobal } from "@/components/busca-global";
 import { MenuUsuario } from "@/components/menu-usuario";
+import { AlternarTema } from "@/components/alternar-tema";
 import { PERFIS, type PerfilAcesso } from "@/lib/dominio";
 import { Toaster } from "@/components/ui/sonner";
 
@@ -37,6 +38,9 @@ export default async function AppLayout({
         <header className="h-14 shrink-0 border-b border-border bg-card/80 backdrop-blur flex items-center justify-between gap-3 px-4 lg:px-6 sticky top-0 z-40">
           <div className="md:hidden font-display font-semibold">CRM DOISGE</div>
           <BuscaGlobal />
+          <div className="flex items-center gap-1">
+            <AlternarTema />
+          </div>
           <MenuUsuario
             nome={perfil.nome}
             email={perfil.email}
