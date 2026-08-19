@@ -135,6 +135,54 @@ export const STATUS_PRODUTO: Record<string, string> = {
   encerrado: "Encerrado",
 };
 
+export const TIPOS_PARCEIRO: Record<string, string> = {
+  canal_comercial: "Canal comercial",
+  revendedor_distribuidor: "Revendedor distribuidor",
+  revendedor_parceiro: "Revendedor parceiro",
+  parceiro_servico: "Parceiro de serviço",
+  consultor: "Consultor",
+  representante_regional: "Representante regional",
+  parceiro_institucional: "Parceiro institucional",
+};
+
+export const TIPOS_PRODUTO: Record<string, string> = {
+  saas: "SaaS (software)",
+  fisico: "Físico",
+  servico: "Serviço",
+  hibrido: "Híbrido",
+};
+
+export type TomPilula = "neutro" | "sucesso" | "alerta" | "erro" | "info";
+
+export const TOM_STATUS_EMPRESA: Record<string, TomPilula> = {
+  prospectada: "neutro",
+  em_negociacao: "alerta",
+  contrato_em_elaboracao: "info",
+  ativa: "sucesso",
+  suspensa: "erro",
+  encerrada: "neutro",
+};
+
+export const TOM_STATUS_PARCEIRO: Record<string, TomPilula> = {
+  prospectado: "neutro",
+  em_qualificacao: "alerta",
+  contrato_em_elaboracao: "info",
+  ativo: "sucesso",
+  suspenso: "erro",
+  inativo: "neutro",
+  descredenciado: "erro",
+  encerrado: "neutro",
+};
+
+export const TOM_STATUS_PRODUTO: Record<string, TomPilula> = {
+  rascunho: "neutro",
+  enviado_para_aprovacao: "alerta",
+  aprovado: "info",
+  ativo: "sucesso",
+  suspenso: "erro",
+  encerrado: "neutro",
+};
+
 export const STATUS_CONTRATO: Record<string, string> = {
   em_elaboracao: "Em elaboração",
   enviado_para_assinatura: "Enviado para assinatura",
