@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useRouter } from "next/navigation";
 import { Plus, Search, Package, Pencil, RefreshCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -47,7 +48,7 @@ export type ProdutoLinha = {
 
 export type EmpresaOpcao = { id: string; razao_social: string; nome_fantasia: string | null };
 
-function FormProduto({
+export function FormProduto({
   produto,
   empresas,
 }: {
@@ -120,7 +121,7 @@ export function ProdutosCliente({
 }) {
   const [busca, setBusca] = React.useState("");
   const [novoAberto, setNovoAberto] = React.useState(false);
-  const [editando, setEditando] = React.useState<ProdutoLinha | null>(null);
+  const router = useRouter();
 
   const semEmpresas = empresas.length === 0;
 
@@ -177,7 +178,7 @@ export function ProdutosCliente({
             </TableHeader>
             <TableBody>
               {filtrados.map((p) => (
-                <TableRow key={p.id} className="cursor-pointer" onClick={() => setEditando(p)}>
+                <TableRow key={p.id} className="cursor-pointer" onClick={() => router.push(`/produtos/${p.id}`)}>
                   <TableCell>
                     <span className="font-medium">{p.nome_produto}</span>
                     {p.descricao_curta && (
@@ -233,17 +234,6 @@ export function ProdutosCliente({
         <FormProduto empresas={empresas} />
       </PainelFormulario>
 
-      <PainelFormulario
-        key={editando?.id ?? "nenhum"}
-        aberto={!!editando}
-        aoFechar={() => setEditando(null)}
-        titulo={editando?.nome_produto ?? "Editar produto"}
-        descricao="Edite os dados e salve."
-        acao={salvarProduto}
-        idRegistro={editando?.id}
-      >
-        <FormProduto produto={editando} empresas={empresas} />
-      </PainelFormulario>
     </div>
   );
 }

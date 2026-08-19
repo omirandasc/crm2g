@@ -289,6 +289,127 @@ export const GRUPOS_FUNIL: { chave: string; rotulo: string; etapas: string[] }[]
   { chave: "perdidas", rotulo: "Perdidas", etapas: ["fechado_perdido", "suspenso"] },
 ];
 
+export const TIPOS_ATIVIDADE: Record<string, string> = {
+  ligacao: "Ligação",
+  reuniao: "Reunião",
+  whatsapp: "WhatsApp",
+  email: "E-mail",
+  visita_presencial: "Visita presencial",
+  apresentacao: "Apresentação",
+  proposta_enviada: "Proposta enviada",
+  follow_up: "Follow-up",
+  negociacao: "Negociação",
+  evento: "Evento",
+  registro_interno: "Registro interno",
+  pendencia: "Pendência",
+  atualizacao_compra_publica: "Atualização de compra pública",
+  atualizacao_entrega: "Atualização de entrega",
+};
+
+export const VISIBILIDADES_ATIVIDADE: Record<string, string> = {
+  interna_doisge: "Interna DOISGE",
+  visivel_portfolio: "Visível ao Portfólio",
+  visivel_rede: "Visível à Rede",
+  visivel_portfolio_e_rede: "Visível a todos",
+  restrita: "Restrita",
+};
+
+export const STATUS_PROPOSTA: Record<string, string> = {
+  solicitada: "Solicitada",
+  em_elaboracao: "Em elaboração",
+  enviada: "Enviada",
+  em_negociacao: "Em negociação",
+  aprovada: "Aprovada",
+  recusada: "Recusada",
+  vencida: "Vencida",
+  substituida: "Substituída",
+};
+
+export const TOM_STATUS_PROPOSTA: Record<string, TomPilula> = {
+  solicitada: "neutro",
+  em_elaboracao: "alerta",
+  enviada: "info",
+  em_negociacao: "alerta",
+  aprovada: "sucesso",
+  recusada: "erro",
+  vencida: "erro",
+  substituida: "neutro",
+};
+
+export const STATUS_COMPRA_PUBLICA: Record<string, string> = {
+  sem_processo_formal: "Sem processo formal",
+  demanda_identificada: "Demanda identificada",
+  termo_referencia_em_elaboracao: "TR em elaboração",
+  cotacao_orcamento: "Cotação/orçamento",
+  processo_administrativo_aberto: "Processo aberto",
+  parecer_juridico: "Parecer jurídico",
+  edital_em_elaboracao: "Edital em elaboração",
+  edital_publicado: "Edital publicado",
+  sessao_agendada: "Sessão agendada",
+  em_disputa: "Em disputa",
+  aguardando_homologacao: "Aguardando homologação",
+  homologado: "Homologado",
+  empenho_emitido: "Empenho emitido",
+  contrato_em_elaboracao: "Contrato em elaboração",
+  contrato_assinado: "Contrato assinado",
+  perdido: "Perdido",
+  cancelado: "Cancelado",
+  suspenso: "Suspenso",
+};
+
+export const TOM_STATUS_COMPRA: Record<string, TomPilula> = {
+  sem_processo_formal: "neutro",
+  demanda_identificada: "neutro",
+  termo_referencia_em_elaboracao: "alerta",
+  cotacao_orcamento: "alerta",
+  processo_administrativo_aberto: "info",
+  parecer_juridico: "info",
+  edital_em_elaboracao: "alerta",
+  edital_publicado: "info",
+  sessao_agendada: "info",
+  em_disputa: "alerta",
+  aguardando_homologacao: "alerta",
+  homologado: "sucesso",
+  empenho_emitido: "sucesso",
+  contrato_em_elaboracao: "alerta",
+  contrato_assinado: "sucesso",
+  perdido: "erro",
+  cancelado: "erro",
+  suspenso: "neutro",
+};
+
+export const TIPOS_DOCUMENTO_COMPRA: Record<string, string> = {
+  termo_referencia: "Termo de referência",
+  estudo_tecnico_preliminar: "Estudo técnico preliminar",
+  justificativa_contratacao: "Justificativa de contratação",
+  justificativa_preco: "Justificativa de preço",
+  razao_escolha_fornecedor: "Razão da escolha do fornecedor",
+  carta_exclusividade: "Carta de exclusividade",
+  atestado_tecnico: "Atestado técnico",
+  parecer_juridico: "Parecer jurídico",
+  cotacao: "Cotação",
+  edital: "Edital",
+  ata_sessao: "Ata da sessão",
+  homologacao: "Homologação",
+  empenho: "Empenho",
+  contrato: "Contrato",
+  publicacao: "Publicação",
+  recurso: "Recurso",
+  outro: "Outro",
+};
+
+export const TIPOS_ORGAO: Record<string, string> = {
+  prefeitura: "Prefeitura",
+  secretaria_municipal: "Secretaria municipal",
+  camara_municipal: "Câmara municipal",
+  autarquia: "Autarquia",
+  fundacao: "Fundação",
+  consorcio_publico: "Consórcio público",
+  hospital_publico: "Hospital público",
+  escola_rede_publica: "Escola da rede pública",
+  outro: "Outro",
+};
+
 export const STATUS_CONTRATO: Record<string, string> = {
   em_elaboracao: "Em elaboração",
   enviado_para_assinatura: "Enviado para assinatura",

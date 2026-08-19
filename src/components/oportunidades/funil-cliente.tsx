@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useRouter } from "next/navigation";
 import { Plus, Target, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -54,7 +55,7 @@ export type OportunidadeLinha = {
   municipios: { id: string; nome: string; uf: string } | null;
 };
 
-function FormOportunidade({
+export function FormOportunidade({
   oportunidade,
   produtos,
   parceiros,
@@ -179,7 +180,7 @@ export function FunilCliente({
   parceiros: Opcao[];
 }) {
   const [novaAberta, setNovaAberta] = React.useState(false);
-  const [editando, setEditando] = React.useState<OportunidadeLinha | null>(null);
+  const router = useRouter();
 
   const porGrupo = (etapas: string[]) =>
     oportunidades.filter((o) => etapas.includes(o.etapa_comercial));
@@ -206,7 +207,7 @@ export function FunilCliente({
           </TableHeader>
           <TableBody>
             {linhas.map((o) => (
-              <TableRow key={o.id} className="cursor-pointer" onClick={() => setEditando(o)}>
+              <TableRow key={o.id} className="cursor-pointer" onClick={() => router.push(`/oportunidades/${o.id}`)}>
                 <TableCell className="font-mono text-xs text-muted-foreground">
                   #{o.codigo}
                 </TableCell>
@@ -308,17 +309,6 @@ export function FunilCliente({
         <FormOportunidade produtos={produtos} parceiros={parceiros} />
       </PainelFormulario>
 
-      <PainelFormulario
-        key={editando?.id ?? "nenhuma"}
-        aberto={!!editando}
-        aoFechar={() => setEditando(null)}
-        titulo={editando ? `#${editando.codigo} · ${editando.nome_oportunidade}` : "Editar"}
-        descricao="Atualize a etapa e os dados do negócio."
-        acao={salvarOportunidade}
-        idRegistro={editando?.id}
-      >
-        <FormOportunidade oportunidade={editando} produtos={produtos} parceiros={parceiros} />
-      </PainelFormulario>
     </div>
   );
 }
