@@ -30,7 +30,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body
-        className={`${archivo.variable} ${publicSans.variable} ${splineMono.variable}`}
+        className={`${archivo.variable} ${publicSans.variable} ${splineMono.variable} font-sans`}
       >
         {children}
       </body>
