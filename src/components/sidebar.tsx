@@ -15,6 +15,7 @@ import {
   Truck,
   ShieldCheck,
   MapPin,
+  KeyRound,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ehPortfolio, ehRede } from "@/lib/dominio";
@@ -68,6 +69,7 @@ function itensPorPerfil(perfil: string): { grupo: string; itens: Item[] }[] {
         { href: "/portfolio", rotulo: "Portfólio", icone: Building2 },
         { href: "/produtos", rotulo: "Produtos", icone: Package },
         { href: "/rede", rotulo: "Rede", icone: Store },
+        { href: "/autorizacoes", rotulo: "Autorizações", icone: KeyRound },
         { href: "/municipios", rotulo: "Municípios", icone: MapPin },
       ],
     },

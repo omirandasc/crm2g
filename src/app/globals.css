@@ -171,9 +171,6 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    transition-duration: 0.01ms !important;
-  }
-}
+/* Observação: não zerar durações globalmente — o Base UI espera o fim da
+   transição para desmontar diálogos, e durações forçadas a ~0 travam o
+   fechamento quando prefers-reduced-motion está ativo. */

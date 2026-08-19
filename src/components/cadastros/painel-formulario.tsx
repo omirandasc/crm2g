@@ -48,7 +48,16 @@ export function PainelFormulario({
   return (
     <Sheet open={aberto} onOpenChange={(a) => !a && aoFechar()}>
       <SheetContent className="w-full sm:max-w-lg overflow-y-auto">
-        <form action={enviar} className="flex h-full flex-col">
+        {/* Submissão manual em transição: evita o reset automático do formulário
+            do React 19, preservando o que o usuário digitou quando a validação falha. */}
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            const dados = new FormData(e.currentTarget);
+            React.startTransition(() => enviar(dados));
+          }}
+          className="flex h-full flex-col"
+        >
           <SheetHeader>
             <SheetTitle>{titulo}</SheetTitle>
             {descricao && <SheetDescription>{descricao}</SheetDescription>}

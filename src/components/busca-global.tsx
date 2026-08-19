@@ -25,6 +25,7 @@ import {
   Truck,
   ShieldCheck,
   MapPin,
+  KeyRound,
 } from "lucide-react";
 
 const DESTINOS = [
@@ -38,6 +39,7 @@ const DESTINOS = [
     { href: "/portfolio", rotulo: "Empresas do Portfólio", icone: Building2 },
     { href: "/produtos", rotulo: "Produtos", icone: Package },
     { href: "/rede", rotulo: "Parceiros da Rede", icone: Store },
+    { href: "/autorizacoes", rotulo: "Autorizações", icone: KeyRound },
   ]},
   { grupo: "Operação", itens: [
     { href: "/compras-publicas", rotulo: "Compras públicas", icone: Landmark },

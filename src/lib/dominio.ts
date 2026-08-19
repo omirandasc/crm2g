@@ -183,6 +183,112 @@ export const TOM_STATUS_PRODUTO: Record<string, TomPilula> = {
   encerrado: "neutro",
 };
 
+export const STATUS_AUTORIZACAO: Record<string, string> = {
+  solicitada: "Solicitada",
+  em_analise: "Em análise",
+  aprovada: "Aprovada",
+  ativa: "Ativa",
+  suspensa: "Suspensa",
+  encerrada: "Encerrada",
+  cancelada: "Cancelada",
+};
+
+export const TOM_STATUS_AUTORIZACAO: Record<string, TomPilula> = {
+  solicitada: "neutro",
+  em_analise: "alerta",
+  aprovada: "info",
+  ativa: "sucesso",
+  suspensa: "erro",
+  encerrada: "neutro",
+  cancelada: "erro",
+};
+
+export const STATUS_AREA_PREFERENCIAL: Record<string, string> = {
+  solicitada: "Solicitada",
+  em_analise: "Em análise",
+  aprovada: "Aprovada",
+  ativa: "Ativa",
+  rejeitada: "Rejeitada",
+  vencida: "Vencida",
+  cancelada: "Cancelada",
+  liberada: "Liberada",
+  convertida_em_exclusiva: "Virou exclusiva",
+};
+
+export const TOM_STATUS_AREA: Record<string, TomPilula> = {
+  solicitada: "neutro",
+  em_analise: "alerta",
+  aprovada: "sucesso",
+  ativa: "sucesso",
+  rejeitada: "erro",
+  vencida: "alerta",
+  cancelada: "erro",
+  liberada: "neutro",
+  convertida_em_exclusiva: "info",
+};
+
+export const ORIGENS_OPORTUNIDADE: Record<string, string> = {
+  doisge: "DOISGE",
+  parceiro: "Parceiro da Rede",
+  empresa_portfolio: "Empresa do Portfólio",
+  indicacao: "Indicação",
+  evento: "Evento",
+  relacionamento_institucional: "Relacionamento institucional",
+  demanda_espontanea: "Demanda espontânea",
+  licitacao: "Licitação",
+  outro: "Outro",
+};
+
+export const TOM_ETAPA: Record<string, TomPilula> = {
+  lead_identificado: "neutro",
+  oportunidade_cadastrada: "neutro",
+  qualificacao_inicial: "neutro",
+  diagnostico_da_dor: "neutro",
+  reuniao_realizada: "info",
+  solucao_apresentada: "info",
+  interesse_validado: "info",
+  proposta_solicitada: "alerta",
+  proposta_enviada: "alerta",
+  modelo_contratacao_definido: "alerta",
+  processo_compra_iniciado: "info",
+  compra_em_andamento: "info",
+  negociacao: "alerta",
+  contrato_em_elaboracao: "alerta",
+  fechado_ganho: "sucesso",
+  fechado_perdido: "erro",
+  suspenso: "neutro",
+};
+
+export const GRUPOS_FUNIL: { chave: string; rotulo: string; etapas: string[] }[] = [
+  {
+    chave: "prospeccao",
+    rotulo: "Prospecção",
+    etapas: ["lead_identificado", "oportunidade_cadastrada", "qualificacao_inicial", "diagnostico_da_dor"],
+  },
+  {
+    chave: "apresentacao",
+    rotulo: "Apresentação",
+    etapas: ["reuniao_realizada", "solucao_apresentada", "interesse_validado"],
+  },
+  {
+    chave: "proposta",
+    rotulo: "Proposta",
+    etapas: ["proposta_solicitada", "proposta_enviada", "modelo_contratacao_definido"],
+  },
+  {
+    chave: "licitacao",
+    rotulo: "Em licitação",
+    etapas: ["processo_compra_iniciado", "compra_em_andamento"],
+  },
+  {
+    chave: "negociacao",
+    rotulo: "Negociação",
+    etapas: ["negociacao", "contrato_em_elaboracao"],
+  },
+  { chave: "ganhas", rotulo: "Ganhas", etapas: ["fechado_ganho"] },
+  { chave: "perdidas", rotulo: "Perdidas", etapas: ["fechado_perdido", "suspenso"] },
+];
+
 export const STATUS_CONTRATO: Record<string, string> = {
   em_elaboracao: "Em elaboração",
   enviado_para_assinatura: "Enviado para assinatura",
