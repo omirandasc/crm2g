@@ -120,16 +120,16 @@ export function Sidebar({ perfil }: { perfil: string }) {
                     <Link
                       href={href}
                       className={cn(
-                        "flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13px] transition-colors",
+                        "flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-[13px] transition-colors",
                         ativo
-                          ? "bg-white text-foreground font-medium shadow-cartao ring-1 ring-black/5"
-                          : "text-sidebar-foreground hover:bg-black/4 hover:text-foreground"
+                          ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
+                          : "text-sidebar-foreground hover:bg-black/5 hover:text-foreground"
                       )}
                     >
                       <Icone
                         size={15}
                         strokeWidth={1.8}
-                        className={ativo ? "text-marca-600" : "text-muted-foreground"}
+                        className={ativo ? "text-marca-700" : "text-muted-foreground"}
                       />
                       {rotulo}
                     </Link>

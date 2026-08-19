@@ -1,10 +1,12 @@
 import { cn } from "@/lib/utils";
 import type { StatusTerritorio } from "@/lib/dominio";
 
+/* Etiquetas sólidas no estilo monday.com:
+   Exclusiva = verde (fechado), Preferencial = laranja (em trabalho), Livre = cinza. */
 const ESTILOS: Record<StatusTerritorio, { rotulo: string; classes: string }> = {
-  livre: { rotulo: "Livre", classes: "bg-livre-fundo text-livre" },
-  preferencial: { rotulo: "Preferencial", classes: "bg-preferencial-fundo text-preferencial" },
-  exclusiva: { rotulo: "Exclusiva", classes: "bg-exclusiva-fundo text-exclusiva" },
+  livre: { rotulo: "Livre", classes: "bg-livre text-white" },
+  preferencial: { rotulo: "Preferencial", classes: "bg-preferencial text-white" },
+  exclusiva: { rotulo: "Exclusiva", classes: "bg-exclusiva text-white" },
 };
 
 /** Selo de status territorial — a linguagem visual central do CRM. */
@@ -19,12 +21,11 @@ export function SeloTerritorio({
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium",
+        "inline-flex min-w-24 items-center justify-center rounded-[5px] px-2.5 py-0.5 text-xs font-medium",
         classes,
         className
       )}
     >
-      <span className="h-1.5 w-1.5 rounded-full bg-current" aria-hidden />
       {rotulo}
     </span>
   );
@@ -39,16 +40,16 @@ export function Pilula({
   children: React.ReactNode;
 }) {
   const tons = {
-    neutro: "bg-livre-fundo text-livre",
+    neutro: "bg-livre-fundo text-tinta-suave",
     sucesso: "bg-sucesso-fundo text-sucesso",
     alerta: "bg-alerta-fundo text-alerta",
     erro: "bg-erro-fundo text-erro",
-    info: "bg-exclusiva-fundo text-exclusiva",
+    info: "bg-marca-50 text-marca-700",
   };
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium",
+        "inline-flex items-center rounded-[5px] px-2.5 py-0.5 text-xs font-medium",
         tons[tom]
       )}
     >

@@ -5,46 +5,46 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  /* Paleta CRM DOISGE — neutra e moderna, verde como acento */
-  --color-papel: #fafafa;
+  /* Paleta CRM DOISGE — linguagem monday.com: clara, azul de ação, status coloridos */
+  --color-papel: #f6f7fb;
   --color-cartao: #ffffff;
-  --color-tinta: #18181b;
-  --color-tinta-suave: #52525b;
-  --color-tinta-fraca: #a1a1aa;
-  --color-linha: #e4e4e7;
-  --color-linha-forte: #d4d4d8;
+  --color-tinta: #323338;
+  --color-tinta-suave: #676879;
+  --color-tinta-fraca: #9699a6;
+  --color-linha: #d0d4e4;
+  --color-linha-forte: #c3c6d4;
 
-  --color-marca-50: #ecfdf5;
-  --color-marca-100: #d1fae5;
-  --color-marca-200: #a7f3d0;
-  --color-marca-600: #059669;
-  --color-marca-700: #047857;
-  --color-marca-800: #065f46;
-  --color-marca-900: #064e3b;
-  --color-marca-950: #022c22;
+  --color-marca-50: #e5f4ff;
+  --color-marca-100: #cce5ff;
+  --color-marca-200: #a3cdff;
+  --color-marca-600: #0073ea;
+  --color-marca-700: #0060b9;
+  --color-marca-800: #004e95;
+  --color-marca-900: #003d75;
+  --color-marca-950: #292f4c;
 
-  /* Linguagem de território */
-  --color-livre: #71717a;
-  --color-livre-fundo: #f4f4f5;
-  --color-preferencial: #b45309;
-  --color-preferencial-fundo: #fef3c7;
-  --color-exclusiva: #2563eb;
-  --color-exclusiva-fundo: #dbeafe;
+  /* Linguagem de território — etiquetas sólidas estilo monday */
+  --color-livre: #7b7e8c;
+  --color-livre-fundo: #eceef5;
+  --color-preferencial: #f0930d;
+  --color-preferencial-fundo: #fdf0dc;
+  --color-exclusiva: #00a25b;
+  --color-exclusiva-fundo: #d9f5e8;
 
-  --color-sucesso: #059669;
-  --color-sucesso-fundo: #ecfdf5;
-  --color-alerta: #b45309;
-  --color-alerta-fundo: #fef3c7;
-  --color-erro: #dc2626;
-  --color-erro-fundo: #fee2e2;
+  --color-sucesso: #00a25b;
+  --color-sucesso-fundo: #d9f5e8;
+  --color-alerta: #c07907;
+  --color-alerta-fundo: #fdf0dc;
+  --color-erro: #d83a52;
+  --color-erro-fundo: #fbe5e8;
 
-  --shadow-cartao: 0 1px 2px rgb(0 0 0 / 0.04);
+  --shadow-cartao: 0 1px 2px rgb(41 47 76 / 0.06);
 }
 
 @theme inline {
-  --font-heading: var(--font-inter), system-ui, sans-serif;
-  --font-display: var(--font-inter), system-ui, sans-serif;
-  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-heading: var(--font-figtree), system-ui, sans-serif;
+  --font-display: var(--font-figtree), system-ui, sans-serif;
+  --font-sans: var(--font-figtree), system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -87,73 +87,73 @@
 }
 
 :root {
-  /* Tokens shadcn — visual claro, neutro e contemporâneo */
-  --background: #fafafa;
-  --foreground: #18181b;
+  /* Tokens shadcn — visual monday.com */
+  --background: #ffffff;
+  --foreground: #323338;
   --card: #ffffff;
-  --card-foreground: #18181b;
+  --card-foreground: #323338;
   --popover: #ffffff;
-  --popover-foreground: #18181b;
-  --primary: #18181b;
-  --primary-foreground: #fafafa;
-  --secondary: #f4f4f5;
-  --secondary-foreground: #27272a;
-  --muted: #f4f4f5;
-  --muted-foreground: #71717a;
-  --accent: #f4f4f5;
-  --accent-foreground: #27272a;
-  --destructive: #dc2626;
-  --border: #e4e4e7;
-  --input: #d4d4d8;
-  --ring: #a1a1aa;
-  --chart-1: #059669;
-  --chart-2: #2563eb;
-  --chart-3: #d97706;
-  --chart-4: #71717a;
-  --chart-5: #dc2626;
-  --radius: 0.625rem;
-  --sidebar: #f4f4f5;
-  --sidebar-foreground: #3f3f46;
-  --sidebar-primary: #18181b;
-  --sidebar-primary-foreground: #fafafa;
-  --sidebar-accent: #ffffff;
-  --sidebar-accent-foreground: #18181b;
-  --sidebar-border: #e4e4e7;
-  --sidebar-ring: #a1a1aa;
+  --popover-foreground: #323338;
+  --primary: #0073ea;
+  --primary-foreground: #ffffff;
+  --secondary: #eceef5;
+  --secondary-foreground: #323338;
+  --muted: #f6f7fb;
+  --muted-foreground: #676879;
+  --accent: #e5f4ff;
+  --accent-foreground: #0060b9;
+  --destructive: #d83a52;
+  --border: #d0d4e4;
+  --input: #c3c6d4;
+  --ring: #0073ea;
+  --chart-1: #0073ea;
+  --chart-2: #00c875;
+  --chart-3: #fdab3d;
+  --chart-4: #a25ddc;
+  --chart-5: #e2445c;
+  --radius: 0.5rem;
+  --sidebar: #f6f7fb;
+  --sidebar-foreground: #52545f;
+  --sidebar-primary: #0073ea;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #cce5ff;
+  --sidebar-accent-foreground: #323338;
+  --sidebar-border: #d0d4e4;
+  --sidebar-ring: #0073ea;
 }
 
 .dark {
-  --background: #09090b;
-  --foreground: #fafafa;
-  --card: #18181b;
-  --card-foreground: #fafafa;
-  --popover: #18181b;
-  --popover-foreground: #fafafa;
-  --primary: #fafafa;
-  --primary-foreground: #18181b;
-  --secondary: #27272a;
-  --secondary-foreground: #fafafa;
-  --muted: #27272a;
-  --muted-foreground: #a1a1aa;
-  --accent: #27272a;
-  --accent-foreground: #fafafa;
-  --destructive: #ef4444;
-  --border: rgb(255 255 255 / 0.1);
-  --input: rgb(255 255 255 / 0.15);
-  --ring: #71717a;
-  --chart-1: #10b981;
-  --chart-2: #3b82f6;
-  --chart-3: #f59e0b;
-  --chart-4: #a1a1aa;
-  --chart-5: #ef4444;
-  --sidebar: #111113;
-  --sidebar-foreground: #d4d4d8;
-  --sidebar-primary: #fafafa;
-  --sidebar-primary-foreground: #18181b;
-  --sidebar-accent: #27272a;
-  --sidebar-accent-foreground: #fafafa;
-  --sidebar-border: rgb(255 255 255 / 0.1);
-  --sidebar-ring: #71717a;
+  --background: #181b34;
+  --foreground: #eceef5;
+  --card: #202443;
+  --card-foreground: #eceef5;
+  --popover: #202443;
+  --popover-foreground: #eceef5;
+  --primary: #4da6ff;
+  --primary-foreground: #10132a;
+  --secondary: #2a2e52;
+  --secondary-foreground: #eceef5;
+  --muted: #2a2e52;
+  --muted-foreground: #9ba0b5;
+  --accent: #1f3a5f;
+  --accent-foreground: #a3cdff;
+  --destructive: #ef5e75;
+  --border: rgb(255 255 255 / 0.12);
+  --input: rgb(255 255 255 / 0.16);
+  --ring: #4da6ff;
+  --chart-1: #4da6ff;
+  --chart-2: #00c875;
+  --chart-3: #fdab3d;
+  --chart-4: #a25ddc;
+  --chart-5: #e2445c;
+  --sidebar: #10132a;
+  --sidebar-foreground: #c8ccdd;
+  --sidebar-primary: #4da6ff;
+  --sidebar-primary-foreground: #10132a;
+  --sidebar-accent: #1f3a5f;
+  --sidebar-accent-foreground: #eceef5;
+  --sidebar-border: rgb(255 255 255 / 0.12);
+  --sidebar-ring: #4da6ff;
 }
 
 @layer base {
@@ -164,7 +164,7 @@
     @apply bg-background text-foreground font-sans antialiased;
   }
   h1, h2, h3 {
-    letter-spacing: -0.02em;
+    letter-spacing: -0.01em;
   }
   ::selection {
     background-color: var(--color-marca-100);
