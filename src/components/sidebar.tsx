@@ -103,7 +103,7 @@ export function Sidebar({ perfil }: { perfil: string }) {
     <aside className="hidden md:flex w-60 shrink-0 flex-col bg-sidebar border-r border-sidebar-border">
       <div className="flex items-center gap-2.5 px-4 h-14">
         <div className="size-7 rounded-lg bg-marca-600 grid place-items-center text-white text-[13px] font-bold tracking-tight">
-          2G
+          GD
         </div>
         <span className="font-semibold tracking-tight text-foreground">
           CRM DOISGE

@@ -21,7 +21,7 @@ export default function LoginPage() {
       <div className="w-full max-w-sm">
         <div className="mb-8 flex flex-col items-center gap-3 text-center">
           <div className="size-11 rounded-xl bg-marca-600 grid place-items-center text-white font-bold tracking-tight shadow-sm">
-            2G
+            GD
           </div>
           <div>
             <h1 className="text-xl font-semibold tracking-tight">CRM DOISGE</h1>
