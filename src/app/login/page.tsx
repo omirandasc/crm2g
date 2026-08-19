@@ -2,6 +2,9 @@
 
 import { useActionState } from "react";
 import { entrar, type EstadoLogin } from "./actions";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 
 export default function LoginPage() {
   const [estado, acao, pendente] = useActionState<EstadoLogin, FormData>(entrar, {});
@@ -11,7 +14,7 @@ export default function LoginPage() {
       {/* Painel institucional */}
       <section className="hidden lg:flex flex-col justify-between bg-marca-950 text-white p-12">
         <div className="flex items-center gap-3">
-          <div className="h-9 w-9 rounded-md bg-marca-600 grid place-items-center font-display font-bold text-lg">
+          <div className="h-9 w-9 rounded-lg bg-marca-600 grid place-items-center font-display font-bold text-lg">
             2G
           </div>
           <span className="font-display font-semibold text-lg tracking-tight">
@@ -45,66 +48,56 @@ export default function LoginPage() {
       </section>
 
       {/* Formulário */}
-      <section className="flex items-center justify-center p-6">
+      <section className="flex items-center justify-center p-6 bg-background">
         <div className="w-full max-w-sm">
           <div className="lg:hidden mb-8 flex items-center gap-3">
-            <div className="h-9 w-9 rounded-md bg-marca-600 grid place-items-center font-display font-bold text-white">
+            <div className="h-9 w-9 rounded-lg bg-marca-600 grid place-items-center font-display font-bold text-white">
               2G
             </div>
             <span className="font-display font-semibold text-lg">CRM DOISGE</span>
           </div>
 
           <h2 className="font-display text-2xl font-semibold tracking-tight">Entrar</h2>
-          <p className="mt-1 text-tinta-suave text-sm">
+          <p className="mt-1 text-sm text-muted-foreground">
             Use o e-mail e a senha cadastrados pela DOISGE.
           </p>
 
           <form action={acao} className="mt-8 space-y-4">
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium mb-1.5">
-                E-mail
-              </label>
-              <input
+            <div className="space-y-1.5">
+              <Label htmlFor="email">E-mail</Label>
+              <Input
                 id="email"
                 name="email"
                 type="email"
                 autoComplete="email"
                 required
-                className="w-full rounded-md border border-linha-forte bg-cartao px-3 py-2.5 text-sm placeholder:text-tinta-fraca focus:border-marca-600"
                 placeholder="voce@empresa.com.br"
               />
             </div>
-            <div>
-              <label htmlFor="senha" className="block text-sm font-medium mb-1.5">
-                Senha
-              </label>
-              <input
+            <div className="space-y-1.5">
+              <Label htmlFor="senha">Senha</Label>
+              <Input
                 id="senha"
                 name="senha"
                 type="password"
                 autoComplete="current-password"
                 required
-                className="w-full rounded-md border border-linha-forte bg-cartao px-3 py-2.5 text-sm focus:border-marca-600"
                 placeholder="••••••••"
               />
             </div>
 
             {estado.erro && (
-              <p role="alert" className="rounded-md bg-erro-fundo text-erro text-sm px-3 py-2.5">
+              <p role="alert" className="rounded-lg bg-erro-fundo text-erro text-sm px-3 py-2.5">
                 {estado.erro}
               </p>
             )}
 
-            <button
-              type="submit"
-              disabled={pendente}
-              className="w-full rounded-md bg-marca-600 hover:bg-marca-700 disabled:opacity-60 text-white font-medium py-2.5 text-sm transition-colors"
-            >
+            <Button type="submit" size="lg" disabled={pendente} className="w-full">
               {pendente ? "Entrando…" : "Entrar"}
-            </button>
+            </Button>
           </form>
 
-          <p className="mt-6 text-xs text-tinta-fraca">
+          <p className="mt-6 text-xs text-muted-foreground">
             Esqueceu a senha? Fale com a Governança DOISGE para redefinir o acesso.
           </p>
         </div>

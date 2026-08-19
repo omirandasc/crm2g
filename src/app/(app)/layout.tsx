@@ -1,9 +1,10 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { Sidebar } from "@/components/sidebar";
+import { BuscaGlobal } from "@/components/busca-global";
+import { MenuUsuario } from "@/components/menu-usuario";
 import { PERFIS, type PerfilAcesso } from "@/lib/dominio";
-import { sair } from "@/app/login/actions";
-import { LogOut } from "lucide-react";
+import { Toaster } from "@/components/ui/sonner";
 
 export default async function AppLayout({
   children,
@@ -33,30 +34,19 @@ export default async function AppLayout({
       <Sidebar perfil={perfil.perfil} />
 
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="h-16 shrink-0 border-b border-linha bg-cartao flex items-center justify-between px-6">
+        <header className="h-14 shrink-0 border-b border-border bg-card/80 backdrop-blur flex items-center justify-between gap-3 px-4 lg:px-6 sticky top-0 z-40">
           <div className="md:hidden font-display font-semibold">CRM DOISGE</div>
-          <div className="hidden md:block" />
-          <div className="flex items-center gap-4">
-            <div className="text-right">
-              <p className="text-sm font-medium leading-tight">{perfil.nome}</p>
-              <p className="text-xs text-tinta-fraca leading-tight">
-                {PERFIS[perfil.perfil as PerfilAcesso] ?? perfil.perfil}
-              </p>
-            </div>
-            <form action={sair}>
-              <button
-                type="submit"
-                title="Sair"
-                className="grid place-items-center h-9 w-9 rounded-md border border-linha hover:bg-papel text-tinta-suave transition-colors"
-              >
-                <LogOut size={16} />
-              </button>
-            </form>
-          </div>
+          <BuscaGlobal />
+          <MenuUsuario
+            nome={perfil.nome}
+            email={perfil.email}
+            perfilRotulo={PERFIS[perfil.perfil as PerfilAcesso] ?? perfil.perfil}
+          />
         </header>
 
-        <main className="flex-1 p-6 lg:p-8">{children}</main>
+        <main className="flex-1 p-4 lg:p-8">{children}</main>
       </div>
+      <Toaster position="bottom-right" />
     </div>
   );
 }

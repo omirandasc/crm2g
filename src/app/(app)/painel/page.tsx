@@ -1,5 +1,15 @@
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { formatarNumero } from "@/lib/utils";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { SeloTerritorio } from "@/components/selo-territorio";
 import {
   Building2,
   Package,
@@ -7,6 +17,8 @@ import {
   Target,
   MapPin,
   FileSignature,
+  ArrowRight,
+  Plus,
 } from "lucide-react";
 
 export const metadata = { title: "Painel" };
@@ -34,48 +46,119 @@ export default async function PainelPage() {
       contar(supabase, "contratos"),
     ]);
 
-  const cartoes = [
+  const indicadores = [
     { rotulo: "Empresas do Portfólio", valor: empresas, icone: Building2, href: "/portfolio" },
     { rotulo: "Produtos", valor: produtos, icone: Package, href: "/produtos" },
     { rotulo: "Parceiros da Rede", valor: parceiros, icone: Store, href: "/rede" },
-    { rotulo: "Municípios na base", valor: municipios, icone: MapPin, href: "/municipios" },
     { rotulo: "Oportunidades", valor: oportunidades, icone: Target, href: "/oportunidades" },
     { rotulo: "Contratos", valor: contratos, icone: FileSignature, href: "/contratos" },
+    { rotulo: "Municípios na base", valor: municipios, icone: MapPin, href: "/municipios" },
+  ];
+
+  const passos = [
+    { feito: empresas > 0, texto: "Cadastrar as empresas do Portfólio e seus produtos", href: "/portfolio" },
+    { feito: parceiros > 0, texto: "Cadastrar os parceiros da Rede e autorizar produtos", href: "/rede" },
+    { feito: false, texto: "Cada revenda escolhe suas 10 cidades em “Minha área”", href: "/territorios" },
+    { feito: oportunidades > 0, texto: "Registrar oportunidades no funil, com as travas ativas", href: "/oportunidades" },
   ];
 
   return (
-    <div className="max-w-6xl">
-      <h1 className="text-2xl font-semibold tracking-tight">Painel</h1>
-      <p className="mt-1 text-sm text-tinta-suave">
-        Visão geral da operação comercial.
-      </p>
+    <div className="max-w-6xl space-y-8">
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">Painel</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Visão geral da operação comercial B2G.
+          </p>
+        </div>
+        <Button nativeButton={false} render={<Link href="/oportunidades" />}>
+          <Plus className="size-4" />
+          Nova oportunidade
+        </Button>
+      </div>
 
-      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {cartoes.map(({ rotulo, valor, icone: Icone, href }) => (
-          <a
-            key={rotulo}
-            href={href}
-            className="rounded-lg border border-linha bg-cartao p-5 shadow-cartao hover:border-marca-200 transition-colors"
-          >
-            <div className="flex items-center justify-between">
-              <p className="text-sm text-tinta-suave">{rotulo}</p>
-              <Icone size={18} className="text-marca-600" strokeWidth={1.8} />
-            </div>
-            <p className="mt-2 font-display text-3xl font-semibold tabular-nums">
-              {formatarNumero(valor)}
-            </p>
-          </a>
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {indicadores.map(({ rotulo, valor, icone: Icone, href }) => (
+          <Link key={rotulo} href={href} className="group">
+            <Card className="transition-colors group-hover:border-marca-200">
+              <CardHeader>
+                <CardDescription className="flex items-center justify-between">
+                  {rotulo}
+                  <Icone className="size-4 text-marca-600" strokeWidth={1.8} />
+                </CardDescription>
+                <CardTitle className="font-display text-3xl tabular-nums">
+                  {formatarNumero(valor)}
+                </CardTitle>
+              </CardHeader>
+            </Card>
+          </Link>
         ))}
       </div>
 
-      <div className="mt-8 rounded-lg border border-linha bg-cartao p-5 shadow-cartao">
-        <h2 className="font-display font-semibold">Primeiros passos</h2>
-        <ol className="mt-3 space-y-2 text-sm text-tinta-suave list-decimal list-inside">
-          <li>Cadastre as empresas do Portfólio e seus produtos.</li>
-          <li>Cadastre os parceiros da Rede e autorize os produtos que cada um pode vender.</li>
-          <li>Cada revenda escolhe suas 10 cidades preferenciais em “Minha área”.</li>
-          <li>As oportunidades passam a ser registradas no funil — com as travas de território e preço ativas.</li>
-        </ol>
+      <div className="grid gap-4 lg:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle className="font-display">Primeiros passos</CardTitle>
+            <CardDescription>
+              O caminho para colocar a operação de pé, na ordem certa.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ol className="space-y-3">
+              {passos.map(({ feito, texto, href }, i) => (
+                <li key={texto}>
+                  <Link
+                    href={href}
+                    className="flex items-center gap-3 text-sm group"
+                  >
+                    <span
+                      className={
+                        feito
+                          ? "grid size-6 shrink-0 place-items-center rounded-full bg-sucesso-fundo text-sucesso text-xs font-semibold"
+                          : "grid size-6 shrink-0 place-items-center rounded-full border border-border text-muted-foreground text-xs font-semibold"
+                      }
+                    >
+                      {feito ? "✓" : i + 1}
+                    </span>
+                    <span className={feito ? "text-muted-foreground line-through" : ""}>
+                      {texto}
+                    </span>
+                    <ArrowRight className="ml-auto size-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </Link>
+                </li>
+              ))}
+            </ol>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="font-display">Como funciona o território</CardTitle>
+            <CardDescription>
+              A linguagem de status que você verá em todo o sistema.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4 text-sm">
+            <div className="flex items-start gap-3">
+              <SeloTerritorio status="livre" className="mt-0.5 shrink-0" />
+              <p className="text-muted-foreground">
+                Cidade disponível: qualquer revenda pode solicitá-la.
+              </p>
+            </div>
+            <div className="flex items-start gap-3">
+              <SeloTerritorio status="preferencial" className="mt-0.5 shrink-0" />
+              <p className="text-muted-foreground">
+                Reservada a uma revenda para prospecção — cada uma mantém sempre 10 cidades.
+              </p>
+            </div>
+            <div className="flex items-start gap-3">
+              <SeloTerritorio status="exclusiva" className="mt-0.5 shrink-0" />
+              <p className="text-muted-foreground">
+                Contrato assinado: a cidade passa a ser exclusiva da revenda e abre uma vaga na preferencial.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
