@@ -1,26 +1,73 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@theme {
+  /* Paleta institucional CRM DOISGE */
+  --color-papel: #f6f7f6;
+  --color-cartao: #ffffff;
+  --color-tinta: #17251f;
+  --color-tinta-suave: #51605a;
+  --color-tinta-fraca: #8b968f;
+  --color-linha: #e2e6e3;
+  --color-linha-forte: #c8cfca;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --color-marca-50: #edf5f0;
+  --color-marca-100: #d5e8de;
+  --color-marca-200: #a9d1bd;
+  --color-marca-600: #1e6b4f;
+  --color-marca-700: #175540;
+  --color-marca-800: #123f30;
+  --color-marca-900: #0e2f25;
+  --color-marca-950: #081d16;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* Linguagem de território */
+  --color-livre: #6b7671;
+  --color-livre-fundo: #eef0ef;
+  --color-preferencial: #9a6a10;
+  --color-preferencial-fundo: #faf1dd;
+  --color-exclusiva: #2e5fa3;
+  --color-exclusiva-fundo: #e7eef8;
+
+  --color-sucesso: #1e6b4f;
+  --color-sucesso-fundo: #e3f1ea;
+  --color-alerta: #9a6a10;
+  --color-alerta-fundo: #faf1dd;
+  --color-erro: #b3392e;
+  --color-erro-fundo: #fae8e6;
+
+  --font-display: var(--font-archivo), system-ui, sans-serif;
+  --font-sans: var(--font-public-sans), system-ui, sans-serif;
+  --font-mono: var(--font-spline-mono), ui-monospace, monospace;
+
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+
+  --shadow-cartao: 0 1px 2px rgb(23 37 31 / 0.05), 0 1px 3px rgb(23 37 31 / 0.06);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-papel);
+  color: var(--color-tinta);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+}
+
+::selection {
+  background-color: var(--color-marca-100);
+}
+
+/* Foco visível e consistente */
+:focus-visible {
+  outline: 2px solid var(--color-marca-600);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }
