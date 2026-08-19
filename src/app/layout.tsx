@@ -1,22 +1,15 @@
 import type { Metadata } from "next";
-import { Archivo, Public_Sans, Spline_Sans_Mono } from "next/font/google";
+import { Inter, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
-const archivo = Archivo({
+const inter = Inter({
   subsets: ["latin"],
-  variable: "--font-archivo",
-  weight: ["500", "600", "700"],
+  variable: "--font-inter",
 });
 
-const publicSans = Public_Sans({
+const geistMono = Geist_Mono({
   subsets: ["latin"],
-  variable: "--font-public-sans",
-});
-
-const splineMono = Spline_Sans_Mono({
-  subsets: ["latin"],
-  variable: "--font-spline-mono",
-  weight: ["400", "500"],
+  variable: "--font-geist-mono",
 });
 
 export const metadata: Metadata = {
@@ -29,9 +22,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="pt-BR">
-      <body
-        className={`${archivo.variable} ${publicSans.variable} ${splineMono.variable} font-sans`}
-      >
+      <body className={`${inter.variable} ${geistMono.variable} font-sans`}>
         {children}
       </body>
     </html>

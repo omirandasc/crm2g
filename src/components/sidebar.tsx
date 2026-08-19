@@ -17,7 +17,7 @@ import {
   MapPin,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { ehDoisge, ehPortfolio, ehRede } from "@/lib/dominio";
+import { ehPortfolio, ehRede } from "@/lib/dominio";
 
 type Item = { href: string; rotulo: string; icone: React.ElementType };
 
@@ -57,7 +57,6 @@ function itensPorPerfil(perfil: string): { grupo: string; itens: Item[] }[] {
       },
     ];
   }
-  // Governança DOISGE (e perfil consulta)
   return [
     {
       grupo: "Visão geral",
@@ -97,21 +96,23 @@ export function Sidebar({ perfil }: { perfil: string }) {
   const grupos = itensPorPerfil(perfil);
 
   return (
-    <aside className="hidden md:flex w-60 shrink-0 flex-col bg-marca-950 text-white">
-      <div className="flex items-center gap-2.5 px-5 h-16">
-        <div className="h-8 w-8 rounded-md bg-marca-600 grid place-items-center font-display font-bold">
+    <aside className="hidden md:flex w-60 shrink-0 flex-col bg-sidebar border-r border-sidebar-border">
+      <div className="flex items-center gap-2.5 px-4 h-14">
+        <div className="size-7 rounded-lg bg-marca-600 grid place-items-center text-white text-[13px] font-bold tracking-tight">
           2G
         </div>
-        <span className="font-display font-semibold tracking-tight">CRM DOISGE</span>
+        <span className="font-semibold tracking-tight text-foreground">
+          CRM DOISGE
+        </span>
       </div>
 
-      <nav className="flex-1 overflow-y-auto px-3 pb-6 space-y-6">
+      <nav className="flex-1 overflow-y-auto px-3 pb-6 pt-1 space-y-5">
         {grupos.map(({ grupo, itens }) => (
           <div key={grupo}>
-            <p className="px-2 mb-1.5 text-[11px] font-medium uppercase tracking-wider text-marca-200/60">
+            <p className="px-2 mb-1 text-[11px] font-medium uppercase tracking-wider text-muted-foreground/70">
               {grupo}
             </p>
-            <ul className="space-y-0.5">
+            <ul className="space-y-px">
               {itens.map(({ href, rotulo, icone: Icone }) => {
                 const ativo = pathname === href || pathname.startsWith(href + "/");
                 return (
@@ -119,13 +120,17 @@ export function Sidebar({ perfil }: { perfil: string }) {
                     <Link
                       href={href}
                       className={cn(
-                        "flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm transition-colors",
+                        "flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13px] transition-colors",
                         ativo
-                          ? "bg-marca-600 text-white font-medium"
-                          : "text-marca-100/80 hover:bg-white/5 hover:text-white"
+                          ? "bg-white text-foreground font-medium shadow-cartao ring-1 ring-black/5"
+                          : "text-sidebar-foreground hover:bg-black/4 hover:text-foreground"
                       )}
                     >
-                      <Icone size={16} strokeWidth={1.8} />
+                      <Icone
+                        size={15}
+                        strokeWidth={1.8}
+                        className={ativo ? "text-marca-600" : "text-muted-foreground"}
+                      />
                       {rotulo}
                     </Link>
                   </li>
