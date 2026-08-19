@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useActionState } from "react";
 import { entrar, type EstadoLogin } from "./actions";
 import { Input } from "@/components/ui/input";
@@ -20,9 +21,13 @@ export default function LoginPage() {
     <main className="min-h-dvh flex flex-col items-center justify-center bg-background p-6">
       <div className="w-full max-w-sm">
         <div className="mb-8 flex flex-col items-center gap-3 text-center">
-          <div className="size-11 rounded-xl bg-marca-600 grid place-items-center text-white font-bold tracking-tight shadow-sm">
-            GD
-          </div>
+          <Image
+            src="/logo-doisge.jpg"
+            alt="Logo DOISGE"
+            width={48}
+            height={48}
+            className="size-12 rounded-2xl shadow-sm"
+          />
           <div>
             <h1 className="text-xl font-semibold tracking-tight">CRM DOISGE</h1>
             <p className="mt-1 text-sm text-muted-foreground">

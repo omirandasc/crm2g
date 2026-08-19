@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
@@ -102,9 +103,13 @@ export function Sidebar({ perfil }: { perfil: string }) {
   return (
     <aside className="hidden md:flex w-60 shrink-0 flex-col bg-sidebar border-r border-sidebar-border">
       <div className="flex items-center gap-2.5 px-4 h-14">
-        <div className="size-7 rounded-lg bg-marca-600 grid place-items-center text-white text-[13px] font-bold tracking-tight">
-          GD
-        </div>
+        <Image
+          src="/logo-doisge.jpg"
+          alt="Logo DOISGE"
+          width={28}
+          height={28}
+          className="size-7 rounded-lg"
+        />
         <span className="font-semibold tracking-tight text-foreground">
           CRM DOISGE
         </span>
