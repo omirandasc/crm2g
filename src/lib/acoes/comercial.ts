@@ -106,6 +106,12 @@ export async function solicitarAreaPreferencial(
         momento: Date.now(),
       };
     }
+    if (error.code === "42501" || error.message.includes("row-level security")) {
+      return {
+        erro: "Sem permissão: só é possível solicitar cidades para produtos com autorização ativa.",
+        momento: Date.now(),
+      };
+    }
     return { erro: error.message, momento: Date.now() };
   }
 
@@ -208,6 +214,12 @@ export async function salvarOportunidade(
     : await supabase.from("oportunidades").insert({ ...campos, status });
 
   if (error) {
+    if (error.code === "42501" || error.message.includes("row-level security")) {
+      return {
+        erro: "Sem permissão para registrar aqui: você só pode criar oportunidades de produtos autorizados e em cidades da sua área (preferencial ativa ou exclusiva). Solicite a cidade em Minha área.",
+        momento: Date.now(),
+      };
+    }
     return { erro: error.message, momento: Date.now() };
   }
 

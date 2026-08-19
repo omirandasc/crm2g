@@ -185,12 +185,19 @@ export function FunilCliente({
   const porGrupo = (etapas: string[]) =>
     oportunidades.filter((o) => etapas.includes(o.etapa_comercial));
 
-  const TabelaFunil = ({ linhas }: { linhas: OportunidadeLinha[] }) =>
+  const TabelaFunil = ({ linhas }: { linhas: OportunidadeLinha[] }) => {
+    const soma = linhas.reduce((acc, o) => acc + (o.valor_venda ?? 0), 0);
+    return (
     linhas.length === 0 ? (
       <div className="rounded-xl border border-dashed border-border bg-card p-10 text-center text-sm text-muted-foreground">
         Nenhuma oportunidade nesta fase.
       </div>
     ) : (
+      <div className="space-y-2">
+      <p className="text-sm text-muted-foreground">
+        <span className="font-medium text-foreground">{linhas.length}</span> oportunidade(s) ·{" "}
+        <span className="font-mono font-semibold text-marca-700 tabular-nums">{formatarMoeda(soma)}</span>
+      </p>
       <div className="overflow-x-auto rounded-xl border border-border bg-card shadow-cartao">
         <Table>
           <TableHeader>
@@ -242,7 +249,10 @@ export function FunilCliente({
           </TableBody>
         </Table>
       </div>
+      </div>
+    )
     );
+  };
 
   return (
     <div className="space-y-5">

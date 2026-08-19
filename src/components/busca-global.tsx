@@ -2,8 +2,9 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { Search } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
 import {
+  Command,
   CommandDialog,
   CommandEmpty,
   CommandGroup,
@@ -13,6 +14,7 @@ import {
 } from "@/components/ui/command";
 import { Button } from "@/components/ui/button";
 import {
+  Search,
   LayoutDashboard,
   Building2,
   Package,
@@ -52,8 +54,12 @@ const DESTINOS = [
   ]},
 ];
 
+type Resultado = { chave: string; rotulo: string; detalhe: string; href: string; icone: React.ElementType };
+
 export function BuscaGlobal() {
   const [aberta, setAberta] = React.useState(false);
+  const [termo, setTermo] = React.useState("");
+  const [resultados, setResultados] = React.useState<Resultado[]>([]);
   const router = useRouter();
 
   React.useEffect(() => {
@@ -66,6 +72,78 @@ export function BuscaGlobal() {
     document.addEventListener("keydown", atalho);
     return () => document.removeEventListener("keydown", atalho);
   }, []);
+
+  // Busca registros no banco enquanto digita (respeitando as permissões do usuário)
+  React.useEffect(() => {
+    if (!aberta || termo.trim().length < 2) {
+      setResultados([]);
+      return;
+    }
+    const t = setTimeout(async () => {
+      const supabase = createClient();
+      const como = `%${termo.trim()}%`;
+      const [oportunidades, empresas, parceiros, municipios] = await Promise.all([
+        supabase
+          .from("oportunidades")
+          .select("id, codigo, nome_oportunidade")
+          .ilike("nome_oportunidade", como)
+          .limit(4),
+        supabase
+          .from("empresas_portfolio")
+          .select("id, razao_social, nome_fantasia")
+          .or(`razao_social.ilike.${como},nome_fantasia.ilike.${como}`)
+          .limit(3),
+        supabase
+          .from("parceiros_rede")
+          .select("id, razao_social, nome_fantasia")
+          .or(`razao_social.ilike.${como},nome_fantasia.ilike.${como}`)
+          .limit(3),
+        supabase
+          .from("municipios")
+          .select("id, nome, uf")
+          .ilike("nome", `${termo.trim()}%`)
+          .limit(3),
+      ]);
+      const lista: Resultado[] = [
+        ...(oportunidades.data ?? []).map((o) => ({
+          chave: `op-${o.id}`,
+          rotulo: `#${o.codigo} ${o.nome_oportunidade}`,
+          detalhe: "Oportunidade",
+          href: `/oportunidades/${o.id}`,
+          icone: Target,
+        })),
+        ...(empresas.data ?? []).map((e) => ({
+          chave: `em-${e.id}`,
+          rotulo: e.nome_fantasia || e.razao_social,
+          detalhe: "Empresa do Portfólio",
+          href: "/portfolio",
+          icone: Building2,
+        })),
+        ...(parceiros.data ?? []).map((p) => ({
+          chave: `pa-${p.id}`,
+          rotulo: p.nome_fantasia || p.razao_social,
+          detalhe: "Parceiro da Rede",
+          href: "/rede",
+          icone: Store,
+        })),
+        ...(municipios.data ?? []).map((m) => ({
+          chave: `mu-${m.id}`,
+          rotulo: `${m.nome} · ${m.uf}`,
+          detalhe: "Município",
+          href: `/municipios?q=${encodeURIComponent(m.nome)}`,
+          icone: MapPin,
+        })),
+      ];
+      setResultados(lista);
+    }, 250);
+    return () => clearTimeout(t);
+  }, [termo, aberta]);
+
+  const irPara = (href: string) => {
+    setAberta(false);
+    setTermo("");
+    router.push(href);
+  };
 
   return (
     <>
@@ -92,27 +170,59 @@ export function BuscaGlobal() {
       </Button>
 
       <CommandDialog open={aberta} onOpenChange={setAberta}>
-        <CommandInput placeholder="Digite para onde quer ir…" />
-        <CommandList>
-          <CommandEmpty>Nada encontrado com esse termo.</CommandEmpty>
-          {DESTINOS.map(({ grupo, itens }) => (
+        <Command shouldFilter={false}>
+          <Command_ termo={termo} setTermo={setTermo} resultados={resultados} irPara={irPara} />
+        </Command>
+      </CommandDialog>
+    </>
+  );
+}
+
+function Command_({
+  termo,
+  setTermo,
+  resultados,
+  irPara,
+}: {
+  termo: string;
+  setTermo: (v: string) => void;
+  resultados: Resultado[];
+  irPara: (href: string) => void;
+}) {
+  return (
+    <>
+      <CommandInput
+        placeholder="Busque oportunidades, empresas, cidades… ou navegue"
+        value={termo}
+        onValueChange={setTermo}
+      />
+      <CommandList>
+        <CommandEmpty>Nada encontrado com esse termo.</CommandEmpty>
+
+        {resultados.length > 0 && (
+          <CommandGroup heading="Registros">
+            {resultados.map((r) => (
+              <CommandItem key={r.chave} value={r.chave} onSelect={() => irPara(r.href)}>
+                <r.icone className="size-4" />
+                <span className="min-w-0 flex-1 truncate">{r.rotulo}</span>
+                <span className="text-xs text-muted-foreground">{r.detalhe}</span>
+              </CommandItem>
+            ))}
+          </CommandGroup>
+        )}
+
+        {termo.trim().length < 2 &&
+          DESTINOS.map(({ grupo, itens }) => (
             <CommandGroup key={grupo} heading={grupo}>
               {itens.map(({ href, rotulo, icone: Icone }) => (
-                <CommandItem
-                  key={href}
-                  onSelect={() => {
-                    setAberta(false);
-                    router.push(href);
-                  }}
-                >
+                <CommandItem key={href} value={rotulo} onSelect={() => irPara(href)}>
                   <Icone className="size-4" />
                   {rotulo}
                 </CommandItem>
               ))}
             </CommandGroup>
           ))}
-        </CommandList>
-      </CommandDialog>
+      </CommandList>
     </>
   );
 }

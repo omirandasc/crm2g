@@ -5,6 +5,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -48,6 +49,7 @@ export function MenuUsuario({
         }
       />
       <DropdownMenuContent align="end" className="w-60">
+        <DropdownMenuGroup>
         <DropdownMenuLabel>
           <span className="flex items-center gap-2">
             <UserRound className="size-4 text-muted-foreground" />
@@ -59,6 +61,7 @@ export function MenuUsuario({
             </span>
           </span>
         </DropdownMenuLabel>
+        </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem variant="destructive" onClick={() => sair()}>
           <LogOut className="size-4" />

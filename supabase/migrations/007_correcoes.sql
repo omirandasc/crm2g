@@ -39,3 +39,26 @@ drop trigger if exists trg_contrato_area_exclusiva on public.contratos;
 create trigger trg_contrato_area_exclusiva
   after insert or update of status_contrato on public.contratos
   for each row execute function public.fn_contrato_gera_area_exclusiva();
+
+-- Parceiro também pode criar oportunidades em cidades EXCLUSIVAS dele
+drop policy if exists ins_oportunidade_parceiro on public.oportunidades;
+create policy ins_oportunidade_parceiro on public.oportunidades for insert to authenticated
+  with check (
+    parceiro_rede_id = fn_meu_parceiro()
+    and fn_produto_autorizado(produto_id)
+    and (
+      exists (
+        select 1 from public.areas_preferenciais ap
+        where ap.produto_id = oportunidades.produto_id
+          and ap.municipio_id = oportunidades.municipio_id
+          and ap.parceiro_rede_id = fn_meu_parceiro()
+          and ap.status in ('aprovada','ativa')
+      )
+      or exists (
+        select 1 from public.areas_exclusivas ae
+        where ae.produto_id = oportunidades.produto_id
+          and ae.municipio_id = oportunidades.municipio_id
+          and ae.parceiro_rede_id = fn_meu_parceiro()
+          and ae.status in ('ativa','em_implantacao','em_renovacao')
+      )
+    ));
