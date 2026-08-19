@@ -95,6 +95,7 @@ export function CampoSelecao({
       </Label>
       <Select
         name={nome}
+        items={permitirVazio ? { "": rotuloVazio, ...opcoes } : opcoes}
         defaultValue={valorInicial ?? (permitirVazio ? "" : undefined)}
         required={obrigatorio}
       >

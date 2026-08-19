@@ -16,6 +16,7 @@ import {
   ShieldCheck,
   MapPin,
   KeyRound,
+  UsersRound,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ehPortfolio, ehRede } from "@/lib/dominio";
@@ -88,6 +89,7 @@ function itensPorPerfil(perfil: string): { grupo: string; itens: Item[] }[] {
         { href: "/comissoes", rotulo: "Comissões", icone: Percent },
         { href: "/entregas", rotulo: "Entregas", icone: Truck },
         { href: "/aprovacoes", rotulo: "Aprovações", icone: ShieldCheck },
+        { href: "/usuarios", rotulo: "Usuários", icone: UsersRound },
       ],
     },
   ];

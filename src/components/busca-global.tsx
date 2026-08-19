@@ -26,6 +26,7 @@ import {
   ShieldCheck,
   MapPin,
   KeyRound,
+  UsersRound,
 } from "lucide-react";
 
 const DESTINOS = [
@@ -47,6 +48,7 @@ const DESTINOS = [
     { href: "/comissoes", rotulo: "Comissões", icone: Percent },
     { href: "/entregas", rotulo: "Entregas", icone: Truck },
     { href: "/aprovacoes", rotulo: "Aprovações", icone: ShieldCheck },
+    { href: "/usuarios", rotulo: "Usuários", icone: UsersRound },
   ]},
 ];
 
