@@ -45,7 +45,9 @@ export type RegistroAuditoria = {
 
 function formatarMomento(iso: string) {
   const d = new Date(iso);
+  // Fuso fixo para o servidor e o navegador renderizarem o mesmo texto (hidratação)
   return d.toLocaleString("pt-BR", {
+    timeZone: "America/Sao_Paulo",
     day: "2-digit",
     month: "2-digit",
     year: "2-digit",
