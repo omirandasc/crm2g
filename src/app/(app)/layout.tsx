@@ -36,7 +36,12 @@ export default async function AppLayout({
 
       <div className="flex-1 flex flex-col min-w-0">
         <header className="h-14 shrink-0 border-b border-border bg-card/80 backdrop-blur flex items-center justify-between gap-3 px-4 lg:px-6 sticky top-0 z-40">
-          <div className="md:hidden font-display font-semibold">CRM DOISGE</div>
+          <div className="md:hidden flex items-center">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo-horizontal-claro.png" alt="CRM DOISGE" className="h-5 w-auto dark:hidden" />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo-horizontal-escuro.png" alt="CRM DOISGE" className="hidden h-5 w-auto dark:block" />
+          </div>
           <BuscaGlobal />
           <div className="flex items-center gap-1">
             <AlternarTema />

@@ -22,16 +22,25 @@ export default function LoginPage() {
       <div className="w-full max-w-sm">
         <div className="mb-8 flex flex-col items-center gap-3 text-center">
           <Image
-            src="/logo-doisge.jpg"
-            alt="Logo DOISGE"
-            width={48}
-            height={48}
-            className="size-12 rounded-2xl shadow-sm"
+            src="/logo-horizontal-claro.png"
+            alt="DOISGE"
+            width={196}
+            height={32}
+            priority
+            className="h-8 w-auto dark:hidden"
+          />
+          <Image
+            src="/logo-horizontal-escuro.png"
+            alt="DOISGE"
+            width={196}
+            height={32}
+            priority
+            className="hidden h-8 w-auto dark:block"
           />
           <div>
-            <h1 className="text-xl font-semibold tracking-tight">CRM DOISGE</h1>
+            <h1 className="sr-only">CRM DOISGE</h1>
             <p className="mt-1 text-sm text-muted-foreground">
-              DoisGe · GovTech · Canal
+              CRM · DoisGe · GovTech · Canal
             </p>
           </div>
         </div>

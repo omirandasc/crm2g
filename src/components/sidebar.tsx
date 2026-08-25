@@ -114,17 +114,23 @@ export function Sidebar({ perfil }: { perfil: string }) {
 
   return (
     <aside className="hidden md:flex w-60 shrink-0 flex-col bg-sidebar border-r border-sidebar-border">
-      <div className="flex items-center gap-2.5 px-4 h-14">
+      <div className="flex items-center px-4 h-14">
         <Image
-          src="/logo-doisge.jpg"
-          alt="Logo DOISGE"
-          width={28}
-          height={28}
-          className="size-7 rounded-lg"
+          src="/logo-horizontal-claro.png"
+          alt="CRM DOISGE"
+          width={135}
+          height={22}
+          priority
+          className="h-[22px] w-auto dark:hidden"
         />
-        <span className="font-semibold tracking-tight text-foreground">
-          CRM DOISGE
-        </span>
+        <Image
+          src="/logo-horizontal-escuro.png"
+          alt="CRM DOISGE"
+          width={135}
+          height={22}
+          priority
+          className="hidden h-[22px] w-auto dark:block"
+        />
       </div>
 
       <nav className="flex-1 overflow-y-auto px-3 pb-6 pt-1 space-y-5">
