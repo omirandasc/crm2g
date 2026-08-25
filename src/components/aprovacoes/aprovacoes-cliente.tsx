@@ -39,7 +39,7 @@ const TIPOS_SOLICITACAO: Record<string, string> = {
   criacao_oportunidade_fora_area: "Oportunidade fora da área",
   alteracao_parametro_contrato: "Alteração de contrato",
   cancelamento_area: "Cancelamento de área",
-  liberacao_visibilidade_portfolio: "Visibilidade ao Portfólio",
+  liberacao_visibilidade_portfolio: "Visibilidade à GovTech",
   outro: "Outro",
 };
 
@@ -224,7 +224,7 @@ export function AprovacoesCliente({ solicitacoes }: { solicitacoes: SolicitacaoL
         aberto={novaAberta}
         aoFechar={() => setNovaAberta(false)}
         titulo="Nova solicitação"
-        descricao="Pedidos que dependem de decisão da Governança DOISGE."
+        descricao="Pedidos que dependem de decisão da DoisGe (Governança)."
         acao={criarSolicitacao}
       >
         <CampoSelecao rotulo="Tipo" nome="tipo_solicitacao" obrigatorio opcoes={TIPOS_SOLICITACAO} valorInicial="excecao_preco" />

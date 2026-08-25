@@ -62,6 +62,14 @@ export default async function OportunidadeDetalhePage({
       .order("nome_orgao"),
   ]);
 
+  const { data: contatos } = oportunidade.orgao_publico_id
+    ? await supabase
+        .from("contatos_publicos")
+        .select("id, nome, cargo, perfil_decisao, email, telefone, whatsapp")
+        .eq("orgao_publico_id", oportunidade.orgao_publico_id)
+        .order("nome")
+    : { data: [] };
+
   const { data: documentos } = processo
     ? await supabase
         .from("documentos_compra_publica")
@@ -103,6 +111,7 @@ export default async function OportunidadeDetalhePage({
         processo={processo ?? null}
         documentos={documentos ?? []}
         orgaos={orgaos ?? []}
+        contatos={contatos ?? []}
         produtos={(produtos ?? []).map((p) => ({ id: p.id, rotulo: p.nome_produto })) as Opcao[]}
         parceiros={(parceiros ?? []).map((p) => ({
           id: p.id,

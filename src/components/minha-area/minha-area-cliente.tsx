@@ -94,7 +94,7 @@ export function MinhaAreaCliente({
 
       {produtosAutorizados.length === 0 && (
         <p className="rounded-lg bg-alerta-fundo px-3 py-2.5 text-sm text-alerta">
-          Você ainda não tem produtos autorizados. Fale com a Governança DOISGE.
+          Você ainda não tem produtos autorizados. Fale com a DoisGe (Governança).
         </p>
       )}
 
@@ -198,7 +198,7 @@ export function MinhaAreaCliente({
         aberto={solicitarAberto}
         aoFechar={() => setSolicitarAberto(false)}
         titulo="Solicitar cidade preferencial"
-        descricao="A solicitação vai para aprovação da Governança DOISGE."
+        descricao="A solicitação vai para aprovação da DoisGe (Governança)."
         acao={solicitarAreaPreferencial}
       >
         <input type="hidden" name="parceiro_rede_id" value={parceiroId} />

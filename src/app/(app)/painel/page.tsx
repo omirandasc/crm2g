@@ -121,9 +121,9 @@ export default async function PainelPage() {
       { rotulo: "Funil em aberto", valor: formatarMoeda(funilAberto), icone: TrendingUp, href: "/oportunidades" },
       { rotulo: "Oportunidades", valor: formatarNumero(oportunidades), icone: Target, href: "/oportunidades" },
       { rotulo: "Contratos", valor: formatarNumero(contratos), icone: FileSignature, href: "/contratos" },
-      { rotulo: "Empresas do Portfólio", valor: formatarNumero(empresas), icone: Building2, href: "/portfolio" },
+      { rotulo: "GovTechs", valor: formatarNumero(empresas), icone: Building2, href: "/portfolio" },
       { rotulo: "Produtos", valor: formatarNumero(produtos), icone: Package, href: "/produtos" },
-      { rotulo: "Parceiros da Rede", valor: formatarNumero(parceiros), icone: Store, href: "/rede" },
+      { rotulo: "Canais", valor: formatarNumero(parceiros), icone: Store, href: "/rede" },
     ];
     void municipios;
   }
@@ -213,8 +213,8 @@ export default async function PainelPage() {
             <CardContent>
               <ol className="space-y-3">
                 {[
-                  { texto: "Cadastrar as empresas do Portfólio e seus produtos", href: "/portfolio" },
-                  { texto: "Cadastrar os parceiros da Rede e autorizar produtos", href: "/rede" },
+                  { texto: "Cadastrar as GovTechs e seus produtos", href: "/portfolio" },
+                  { texto: "Cadastrar os canais e autorizar produtos", href: "/rede" },
                   { texto: "Aprovar as cidades preferenciais das revendas", href: "/territorios" },
                   { texto: "Acompanhar oportunidades, contratos e comissões", href: "/oportunidades" },
                 ].map(({ texto, href }, i) => (

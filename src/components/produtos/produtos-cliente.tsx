@@ -160,7 +160,7 @@ export function ProdutosCliente({
           <Package className="mx-auto size-8 text-marca-600" strokeWidth={1.5} />
           <p className="mt-3 font-medium">Nenhum produto cadastrado ainda</p>
           <p className="mt-1 text-sm text-muted-foreground">
-            O produto é o que a Rede vende — com preços, materiais e autorizações.
+            O produto é o que os Canais vendem — com preços, materiais e autorizações.
           </p>
         </div>
       ) : (
@@ -228,7 +228,7 @@ export function ProdutosCliente({
         aberto={novoAberto}
         aoFechar={() => setNovoAberto(false)}
         titulo="Novo produto"
-        descricao="Solução que será vendida pela Rede aos municípios."
+        descricao="Solução que será vendida pelos Canais aos municípios."
         acao={salvarProduto}
       >
         <FormProduto empresas={empresas} />

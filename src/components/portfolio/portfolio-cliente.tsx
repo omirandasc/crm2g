@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useRouter } from "next/navigation";
 import { Plus, Search, Building2, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -40,9 +41,10 @@ export type EmpresaLinha = {
   email_responsavel: string | null;
   telefone_responsavel: string | null;
   observacoes: string | null;
+  dados_bancarios: { banco?: string | null; agencia?: string | null; conta?: string | null; chave_pix?: string | null } | null;
 };
 
-function FormEmpresa({ empresa }: { empresa?: EmpresaLinha | null }) {
+export function FormEmpresa({ empresa }: { empresa?: EmpresaLinha | null }) {
   return (
     <>
       <SecaoFormulario titulo="Identificação" />
@@ -70,6 +72,14 @@ function FormEmpresa({ empresa }: { empresa?: EmpresaLinha | null }) {
         <CampoTexto rotulo="Telefone" nome="telefone_responsavel" valorInicial={empresa?.telefone_responsavel} />
       </div>
 
+
+      <SecaoFormulario titulo="Dados bancários" />
+      <div className="grid grid-cols-3 gap-3">
+        <CampoTexto rotulo="Banco" nome="banco" valorInicial={empresa?.dados_bancarios?.banco} />
+        <CampoTexto rotulo="Agência" nome="agencia" valorInicial={empresa?.dados_bancarios?.agencia} />
+        <CampoTexto rotulo="Conta" nome="conta" valorInicial={empresa?.dados_bancarios?.conta} />
+      </div>
+      <CampoTexto rotulo="Chave Pix" nome="chave_pix" valorInicial={empresa?.dados_bancarios?.chave_pix} />
       <CampoTextoLongo rotulo="Observações" nome="observacoes" valorInicial={empresa?.observacoes} />
     </>
   );
@@ -78,7 +88,7 @@ function FormEmpresa({ empresa }: { empresa?: EmpresaLinha | null }) {
 export function PortfolioCliente({ empresas }: { empresas: EmpresaLinha[] }) {
   const [busca, setBusca] = React.useState("");
   const [novaAberta, setNovaAberta] = React.useState(false);
-  const [editando, setEditando] = React.useState<EmpresaLinha | null>(null);
+  const router = useRouter();
 
   const filtradas = empresas.filter((e) => {
     const termo = busca.toLowerCase();
@@ -138,7 +148,7 @@ export function PortfolioCliente({ empresas }: { empresas: EmpresaLinha[] }) {
                 <TableRow
                   key={e.id}
                   className="cursor-pointer"
-                  onClick={() => setEditando(e)}
+                  onClick={() => router.push(`/portfolio/${e.id}`)}
                 >
                   <TableCell>
                     <span className="font-medium">{e.nome_fantasia || e.razao_social}</span>
@@ -176,24 +186,13 @@ export function PortfolioCliente({ empresas }: { empresas: EmpresaLinha[] }) {
       <PainelFormulario
         aberto={novaAberta}
         aoFechar={() => setNovaAberta(false)}
-        titulo="Nova empresa do Portfólio"
+        titulo="Nova GovTech"
         descricao="Empresa dona de produto que será vendido pela Rede."
         acao={salvarEmpresa}
       >
         <FormEmpresa />
       </PainelFormulario>
 
-      <PainelFormulario
-        key={editando?.id ?? "nenhuma"}
-        aberto={!!editando}
-        aoFechar={() => setEditando(null)}
-        titulo={editando?.nome_fantasia || editando?.razao_social || "Editar empresa"}
-        descricao="Edite os dados e salve."
-        acao={salvarEmpresa}
-        idRegistro={editando?.id}
-      >
-        <FormEmpresa empresa={editando} />
-      </PainelFormulario>
     </div>
   );
 }

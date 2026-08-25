@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Plus, Landmark, FileText, MessageSquare } from "lucide-react";
+import { Plus, Landmark, FileText, MessageSquare, UserRound } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Card,
@@ -36,6 +36,7 @@ import {
   TIPOS_COMPRA_PUBLICA,
   TIPOS_DOCUMENTO_COMPRA,
   TIPOS_ORGAO,
+  PERFIS_DECISAO,
 } from "@/lib/dominio";
 import { salvarOportunidade } from "@/lib/acoes/comercial";
 import {
@@ -46,6 +47,7 @@ import {
   criarOrgao,
   vincularOrgaos,
 } from "@/lib/acoes/oportunidade-detalhe";
+import { salvarContatoPublico } from "@/lib/acoes/complementos";
 import { formatarMoeda, formatarData } from "@/lib/utils";
 
 export type Atividade = {
@@ -96,6 +98,16 @@ export type Documento = {
 
 export type Orgao = { id: string; nome_orgao: string; tipo_orgao: string };
 
+export type ContatoPublico = {
+  id: string;
+  nome: string;
+  cargo: string | null;
+  perfil_decisao: string | null;
+  email: string | null;
+  telefone: string | null;
+  whatsapp: string | null;
+};
+
 export function DetalheOportunidade({
   oportunidade,
   atividades,
@@ -103,6 +115,7 @@ export function DetalheOportunidade({
   processo,
   documentos,
   orgaos,
+  contatos,
   produtos,
   parceiros,
 }: {
@@ -115,6 +128,7 @@ export function DetalheOportunidade({
   processo: Processo;
   documentos: Documento[];
   orgaos: Orgao[];
+  contatos: ContatoPublico[];
   produtos: Opcao[];
   parceiros: Opcao[];
 }) {
@@ -122,6 +136,7 @@ export function DetalheOportunidade({
   const [propostaAberta, setPropostaAberta] = React.useState(false);
   const [editandoProposta, setEditandoProposta] = React.useState<Proposta | null>(null);
   const [docAberto, setDocAberto] = React.useState(false);
+  const [contatoAberto, setContatoAberto] = React.useState(false);
 
   const opcoesOrgaos = Object.fromEntries(
     orgaos.map((o) => [o.id, `${o.nome_orgao} (${TIPOS_ORGAO[o.tipo_orgao] ?? o.tipo_orgao})`])
@@ -190,6 +205,7 @@ export function DetalheOportunidade({
           </CardContent>
         </Card>
 
+        <div className="space-y-4">
         <Card>
           <CardHeader>
             <CardTitle>Órgão e faturamento</CardTitle>
@@ -225,6 +241,61 @@ export function DetalheOportunidade({
             </Button>
           </CardContent>
         </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Contatos do órgão</CardTitle>
+            <CardDescription>
+              Quem decide, influencia e opera dentro do órgão comprador.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {!oportunidade.orgao_publico_id ? (
+              <p className="rounded-lg border border-dashed border-border p-4 text-center text-sm text-muted-foreground">
+                Vincule um órgão comprador para registrar contatos.
+              </p>
+            ) : contatos.length === 0 ? (
+              <p className="rounded-lg border border-dashed border-border p-4 text-center text-sm text-muted-foreground">
+                Nenhum contato registrado neste órgão ainda.
+              </p>
+            ) : (
+              <ul className="space-y-2">
+                {contatos.map((c) => (
+                  <li key={c.id} className="flex items-start gap-2.5 rounded-lg border border-border p-2.5">
+                    <div className="mt-0.5 grid size-7 shrink-0 place-items-center rounded-md bg-marca-50 text-marca-700">
+                      <UserRound className="size-3.5" />
+                    </div>
+                    <div className="min-w-0 flex-1 text-sm">
+                      <p className="flex flex-wrap items-center gap-1.5">
+                        <span className="font-medium">{c.nome}</span>
+                        {c.perfil_decisao && (
+                          <Pilula tom={c.perfil_decisao === "decisor" ? "sucesso" : "neutro"}>
+                            {PERFIS_DECISAO[c.perfil_decisao] ?? c.perfil_decisao}
+                          </Pilula>
+                        )}
+                      </p>
+                      {c.cargo && <p className="text-xs text-muted-foreground">{c.cargo}</p>}
+                      {(c.email || c.telefone || c.whatsapp) && (
+                        <p className="mt-0.5 truncate text-xs text-muted-foreground">
+                          {[c.email, c.telefone, c.whatsapp && `WhatsApp ${c.whatsapp}`]
+                            .filter(Boolean)
+                            .join(" · ")}
+                        </p>
+                      )}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+            {oportunidade.orgao_publico_id && (
+              <Button variant="outline" size="sm" onClick={() => setContatoAberto(true)}>
+                <Plus className="size-3.5" />
+                Adicionar contato
+              </Button>
+            )}
+          </CardContent>
+        </Card>
+        </div>
       </TabsContent>
 
       {/* ── Atividades ─────────────────────────────────────────── */}
@@ -424,6 +495,33 @@ export function DetalheOportunidade({
         <div className="grid grid-cols-2 gap-3">
           <CampoTexto rotulo="E-mail" nome="email" tipo="email" />
           <CampoTexto rotulo="Telefone" nome="telefone" />
+        </div>
+      </PainelFormulario>
+
+      <PainelFormulario
+        aberto={contatoAberto}
+        aoFechar={() => setContatoAberto(false)}
+        titulo="Novo contato do órgão"
+        descricao="O contato fica vinculado ao órgão comprador desta oportunidade."
+        acao={salvarContatoPublico}
+      >
+        <input type="hidden" name="orgao_publico_id" value={oportunidade.orgao_publico_id ?? ""} />
+        <input type="hidden" name="oportunidade_id" value={oportunidade.id} />
+        <CampoTexto rotulo="Nome" nome="nome" obrigatorio placeholder="Ex.: Maria da Silva" />
+        <div className="grid grid-cols-2 gap-3">
+          <CampoTexto rotulo="Cargo" nome="cargo" placeholder="Ex.: Secretária de Saúde" />
+          <CampoSelecao
+            rotulo="Perfil de decisão"
+            nome="perfil_decisao"
+            opcoes={PERFIS_DECISAO}
+            permitirVazio
+            rotuloVazio="— Não definido —"
+          />
+        </div>
+        <CampoTexto rotulo="E-mail" nome="email" tipo="email" />
+        <div className="grid grid-cols-2 gap-3">
+          <CampoTexto rotulo="Telefone" nome="telefone" />
+          <CampoTexto rotulo="WhatsApp" nome="whatsapp" />
         </div>
       </PainelFormulario>
 

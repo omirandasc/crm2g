@@ -19,7 +19,7 @@ const texto = z
 
 const obrigatorio = (msg: string) => z.string().trim().min(1, msg);
 
-// ── Empresa do Portfólio ─────────────────────────────────────────
+// ── GovTech ─────────────────────────────────────────
 const esquemaEmpresa = z.object({
   id: texto,
   razao_social: obrigatorio("Informe a razão social da empresa."),
@@ -34,6 +34,10 @@ const esquemaEmpresa = z.object({
   email_responsavel: texto,
   telefone_responsavel: texto,
   observacoes: texto,
+  banco: texto,
+  agencia: texto,
+  conta: texto,
+  chave_pix: texto,
 });
 
 export async function salvarEmpresa(
@@ -45,7 +49,8 @@ export async function salvarEmpresa(
     return { erro: dados.error.issues[0].message, momento: Date.now() };
   }
 
-  const { id, ...campos } = dados.data;
+  const { id, banco, agencia, conta, chave_pix, ...resto } = dados.data;
+  const campos = { ...resto, dados_bancarios: { banco, agencia, conta, chave_pix } };
   const supabase = await createClient();
 
   const { error } = id
@@ -107,7 +112,7 @@ export async function salvarProduto(
   return { ok: true, momento: Date.now() };
 }
 
-// ── Parceiro da Rede ─────────────────────────────────────────────
+// ── Canal ─────────────────────────────────────────────
 const esquemaParceiro = z.object({
   id: texto,
   razao_social: obrigatorio("Informe a razão social do parceiro."),
@@ -123,6 +128,10 @@ const esquemaParceiro = z.object({
   telefone_responsavel: texto,
   consultor_responsavel: texto,
   observacoes: texto,
+  banco: texto,
+  agencia: texto,
+  conta: texto,
+  chave_pix: texto,
 });
 
 export async function salvarParceiro(
@@ -134,7 +143,8 @@ export async function salvarParceiro(
     return { erro: dados.error.issues[0].message, momento: Date.now() };
   }
 
-  const { id, ...campos } = dados.data;
+  const { id, banco, agencia, conta, chave_pix, ...resto } = dados.data;
+  const campos = { ...resto, dados_bancarios: { banco, agencia, conta, chave_pix } };
   const supabase = await createClient();
 
   const { error } = id

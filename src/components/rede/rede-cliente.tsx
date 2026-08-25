@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useRouter } from "next/navigation";
 import { Plus, Search, Store, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -43,9 +44,10 @@ export type ParceiroLinha = {
   telefone_responsavel: string | null;
   consultor_responsavel: string | null;
   observacoes: string | null;
+  dados_bancarios: { banco?: string | null; agencia?: string | null; conta?: string | null; chave_pix?: string | null } | null;
 };
 
-function FormParceiro({ parceiro }: { parceiro?: ParceiroLinha | null }) {
+export function FormParceiro({ parceiro }: { parceiro?: ParceiroLinha | null }) {
   return (
     <>
       <SecaoFormulario titulo="Identificação" />
@@ -76,6 +78,14 @@ function FormParceiro({ parceiro }: { parceiro?: ParceiroLinha | null }) {
         <CampoTexto rotulo="Telefone" nome="telefone_responsavel" valorInicial={parceiro?.telefone_responsavel} />
       </div>
 
+
+      <SecaoFormulario titulo="Dados bancários" />
+      <div className="grid grid-cols-3 gap-3">
+        <CampoTexto rotulo="Banco" nome="banco" valorInicial={parceiro?.dados_bancarios?.banco} />
+        <CampoTexto rotulo="Agência" nome="agencia" valorInicial={parceiro?.dados_bancarios?.agencia} />
+        <CampoTexto rotulo="Conta" nome="conta" valorInicial={parceiro?.dados_bancarios?.conta} />
+      </div>
+      <CampoTexto rotulo="Chave Pix" nome="chave_pix" valorInicial={parceiro?.dados_bancarios?.chave_pix} />
       <CampoTextoLongo rotulo="Observações" nome="observacoes" valorInicial={parceiro?.observacoes} />
     </>
   );
@@ -84,7 +94,7 @@ function FormParceiro({ parceiro }: { parceiro?: ParceiroLinha | null }) {
 export function RedeCliente({ parceiros }: { parceiros: ParceiroLinha[] }) {
   const [busca, setBusca] = React.useState("");
   const [novoAberto, setNovoAberto] = React.useState(false);
-  const [editando, setEditando] = React.useState<ParceiroLinha | null>(null);
+  const router = useRouter();
 
   const filtrados = parceiros.filter((p) => {
     const termo = busca.toLowerCase();
@@ -141,7 +151,7 @@ export function RedeCliente({ parceiros }: { parceiros: ParceiroLinha[] }) {
             </TableHeader>
             <TableBody>
               {filtrados.map((p) => (
-                <TableRow key={p.id} className="cursor-pointer" onClick={() => setEditando(p)}>
+                <TableRow key={p.id} className="cursor-pointer" onClick={() => router.push(`/rede/${p.id}`)}>
                   <TableCell>
                     <span className="font-medium">{p.nome_fantasia || p.razao_social}</span>
                     {p.cidade && (
@@ -184,24 +194,13 @@ export function RedeCliente({ parceiros }: { parceiros: ParceiroLinha[] }) {
       <PainelFormulario
         aberto={novoAberto}
         aoFechar={() => setNovoAberto(false)}
-        titulo="Novo parceiro da Rede"
+        titulo="Novo canal"
         descricao="Revenda, canal ou representante que vende aos municípios."
         acao={salvarParceiro}
       >
         <FormParceiro />
       </PainelFormulario>
 
-      <PainelFormulario
-        key={editando?.id ?? "nenhum"}
-        aberto={!!editando}
-        aoFechar={() => setEditando(null)}
-        titulo={editando?.nome_fantasia || editando?.razao_social || "Editar parceiro"}
-        descricao="Edite os dados e salve."
-        acao={salvarParceiro}
-        idRegistro={editando?.id}
-      >
-        <FormParceiro parceiro={editando} />
-      </PainelFormulario>
     </div>
   );
 }

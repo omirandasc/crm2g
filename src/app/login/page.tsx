@@ -31,7 +31,7 @@ export default function LoginPage() {
           <div>
             <h1 className="text-xl font-semibold tracking-tight">CRM DOISGE</h1>
             <p className="mt-1 text-sm text-muted-foreground">
-              Portfólio · Rede · Governança
+              DoisGe · GovTech · Canal
             </p>
           </div>
         </div>
@@ -82,7 +82,7 @@ export default function LoginPage() {
         </Card>
 
         <p className="mt-6 text-center text-xs text-muted-foreground">
-          Esqueceu a senha? Fale com a Governança DOISGE para redefinir o acesso.
+          Esqueceu a senha? Fale com a DoisGe (Governança) para redefinir o acesso.
         </p>
       </div>
     </main>

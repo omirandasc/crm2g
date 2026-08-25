@@ -29,7 +29,7 @@ export default async function MinhaAreaPage() {
         <h1 className="text-2xl font-semibold tracking-tight">Minha área</h1>
         <div className="rounded-xl border border-dashed border-border bg-card p-10 text-center">
           <Map className="mx-auto size-8 text-marca-600" strokeWidth={1.5} />
-          <p className="mt-3 font-medium">Visão exclusiva da Rede</p>
+          <p className="mt-3 font-medium">Visão exclusiva do Canal</p>
           <p className="mt-1 text-sm text-muted-foreground">
             Esta tela mostra as cidades preferenciais e exclusivas do parceiro
             logado. Como Governança, use{" "}

@@ -29,19 +29,23 @@ import {
   MapPin,
   KeyRound,
   UsersRound,
+  ScrollText,
+  History,
+  BarChart3,
 } from "lucide-react";
 
 const DESTINOS = [
   { grupo: "Ir para", itens: [
     { href: "/painel", rotulo: "Painel", icone: LayoutDashboard },
     { href: "/oportunidades", rotulo: "Funil de vendas", icone: Target },
+    { href: "/relatorios", rotulo: "Relatórios", icone: BarChart3 },
     { href: "/territorios", rotulo: "Territórios", icone: Map },
     { href: "/municipios", rotulo: "Municípios", icone: MapPin },
   ]},
   { grupo: "Cadastros", itens: [
-    { href: "/portfolio", rotulo: "Empresas do Portfólio", icone: Building2 },
+    { href: "/portfolio", rotulo: "GovTechs", icone: Building2 },
     { href: "/produtos", rotulo: "Produtos", icone: Package },
-    { href: "/rede", rotulo: "Parceiros da Rede", icone: Store },
+    { href: "/rede", rotulo: "Canais", icone: Store },
     { href: "/autorizacoes", rotulo: "Autorizações", icone: KeyRound },
   ]},
   { grupo: "Operação", itens: [
@@ -50,6 +54,8 @@ const DESTINOS = [
     { href: "/comissoes", rotulo: "Comissões", icone: Percent },
     { href: "/entregas", rotulo: "Entregas", icone: Truck },
     { href: "/aprovacoes", rotulo: "Aprovações", icone: ShieldCheck },
+    { href: "/politicas", rotulo: "Políticas", icone: ScrollText },
+    { href: "/auditoria", rotulo: "Auditoria", icone: History },
     { href: "/usuarios", rotulo: "Usuários", icone: UsersRound },
   ]},
 ];
@@ -115,14 +121,14 @@ export function BuscaGlobal() {
         ...(empresas.data ?? []).map((e) => ({
           chave: `em-${e.id}`,
           rotulo: e.nome_fantasia || e.razao_social,
-          detalhe: "Empresa do Portfólio",
+          detalhe: "GovTech",
           href: "/portfolio",
           icone: Building2,
         })),
         ...(parceiros.data ?? []).map((p) => ({
           chave: `pa-${p.id}`,
           rotulo: p.nome_fantasia || p.razao_social,
-          detalhe: "Parceiro da Rede",
+          detalhe: "Canal",
           href: "/rede",
           icone: Store,
         })),

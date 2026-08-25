@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: { default: "CRM DOISGE", template: "%s · CRM DOISGE" },
-  description: "Governança comercial B2G — Portfólio, Rede e Territórios",
+  description: "Governança comercial B2G — DoisGe, GovTechs e Canais",
 };
 
 export default function RootLayout({

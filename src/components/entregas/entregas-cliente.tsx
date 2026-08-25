@@ -35,7 +35,7 @@ const STATUS_ENTREGA: Record<string, string> = {
   implantacao_concluida: "Implantação concluída",
   em_suporte: "Em suporte",
   pendente_cliente: "Pendente: cliente",
-  pendente_portfolio: "Pendente: Portfólio",
+  pendente_portfolio: "Pendente: GovTech",
   pendente_parceiro: "Pendente: parceiro",
   finalizada: "Finalizada",
   cancelada: "Cancelada",
@@ -59,8 +59,8 @@ const TOM_ENTREGA: Record<string, TomPilula> = {
 };
 
 const RESPONSAVEIS: Record<string, string> = {
-  portfolio: "Empresa do Portfólio",
-  parceiro_rede: "Parceiro da Rede",
+  portfolio: "GovTech",
+  parceiro_rede: "Canal",
   doisge: "DOISGE",
   compartilhado: "Compartilhado",
   terceiro: "Terceiro",
@@ -134,8 +134,8 @@ export function EntregasCliente({
           <Truck className="mx-auto size-8 text-marca-600" strokeWidth={1.5} />
           <p className="mt-3 font-medium">Nenhuma entrega em andamento</p>
           <p className="mt-1 text-sm text-muted-foreground">
-            A entrega/implantação nasce de um contrato e pode ser do Portfólio,
-            da Rede, da DOISGE ou compartilhada.
+            A entrega/implantação nasce de um contrato e pode ser da GovTech,
+            do Canal, da DoisGe ou compartilhada.
           </p>
         </div>
       ) : (

@@ -77,8 +77,8 @@ const TIPOS_MATERIAL: Record<string, string> = {
 
 const VISIBILIDADES_MATERIAL: Record<string, string> = {
   interno_doisge: "Interno DOISGE",
-  portfolio: "Portfólio",
-  rede_autorizada: "Rede autorizada",
+  portfolio: "GovTech",
+  rede_autorizada: "Canais autorizados",
   publico: "Público",
   restrito: "Restrito",
 };

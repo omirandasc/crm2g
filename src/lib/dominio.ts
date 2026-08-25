@@ -14,14 +14,14 @@ export type PerfilAcesso =
 
 export const PERFIS: Record<PerfilAcesso, string> = {
   administrador_geral: "Administrador geral",
-  governanca_doisge: "Governança DOISGE",
+  governanca_doisge: "DoisGe (Governança)",
   gestor_comercial_doisge: "Gestor comercial",
   gestor_financeiro_doisge: "Gestor financeiro",
   gestor_contratos_doisge: "Gestor de contratos",
-  usuario_portfolio: "Usuário do Portfólio",
-  administrador_portfolio: "Administrador do Portfólio",
-  usuario_rede: "Usuário da Rede",
-  administrador_rede: "Administrador da Rede",
+  usuario_portfolio: "Usuário GovTech",
+  administrador_portfolio: "Administrador GovTech",
+  usuario_rede: "Usuário do Canal",
+  administrador_rede: "Administrador do Canal",
   usuario_consulta: "Consulta",
 };
 
@@ -229,8 +229,8 @@ export const TOM_STATUS_AREA: Record<string, TomPilula> = {
 
 export const ORIGENS_OPORTUNIDADE: Record<string, string> = {
   doisge: "DOISGE",
-  parceiro: "Parceiro da Rede",
-  empresa_portfolio: "Empresa do Portfólio",
+  parceiro: "Canal",
+  empresa_portfolio: "GovTech",
   indicacao: "Indicação",
   evento: "Evento",
   relacionamento_institucional: "Relacionamento institucional",
@@ -308,8 +308,8 @@ export const TIPOS_ATIVIDADE: Record<string, string> = {
 
 export const VISIBILIDADES_ATIVIDADE: Record<string, string> = {
   interna_doisge: "Interna DOISGE",
-  visivel_portfolio: "Visível ao Portfólio",
-  visivel_rede: "Visível à Rede",
+  visivel_portfolio: "Visível à GovTech",
+  visivel_rede: "Visível ao Canal",
   visivel_portfolio_e_rede: "Visível a todos",
   restrita: "Restrita",
 };
@@ -408,6 +408,48 @@ export const TIPOS_ORGAO: Record<string, string> = {
   hospital_publico: "Hospital público",
   escola_rede_publica: "Escola da rede pública",
   outro: "Outro",
+};
+
+export const PERFIS_DECISAO: Record<string, string> = {
+  decisor: "Decisor",
+  influenciador: "Influenciador",
+  facilitador: "Facilitador",
+  tecnico: "Técnico",
+  compras_licitacao: "Compras / Licitação",
+  juridico: "Jurídico",
+  financeiro: "Financeiro",
+  operacional: "Operacional",
+  usuario_final: "Usuário final",
+};
+
+export const TIPOS_POLITICA: Record<string, string> = {
+  preco: "Preço",
+  desconto: "Desconto",
+  comissao: "Comissão",
+  area_preferencial: "Área preferencial",
+  area_exclusiva: "Área exclusiva",
+  faturamento: "Faturamento",
+  pagamento: "Pagamento",
+  entrega: "Entrega",
+  suporte: "Suporte",
+  renovacao: "Renovação",
+  direito_economico: "Direito econômico",
+  descredenciamento: "Descredenciamento",
+  protecao_oportunidade: "Proteção de oportunidade",
+};
+
+export const STATUS_POLITICA: Record<string, string> = {
+  rascunho: "Rascunho",
+  ativa: "Ativa",
+  suspensa: "Suspensa",
+  encerrada: "Encerrada",
+};
+
+export const TOM_STATUS_POLITICA: Record<string, TomPilula> = {
+  rascunho: "neutro",
+  ativa: "sucesso",
+  suspensa: "alerta",
+  encerrada: "neutro",
 };
 
 export const STATUS_CONTRATO: Record<string, string> = {

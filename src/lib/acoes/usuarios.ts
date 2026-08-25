@@ -55,10 +55,10 @@ export async function criarUsuario(
   }
 
   if (dados.data.perfil.includes("portfolio") && !dados.data.empresa_portfolio_id) {
-    return { erro: "Usuário do Portfólio precisa estar vinculado a uma empresa.", momento: Date.now() };
+    return { erro: "Usuário GovTech precisa estar vinculado a uma empresa.", momento: Date.now() };
   }
   if (dados.data.perfil.includes("rede") && !dados.data.parceiro_rede_id) {
-    return { erro: "Usuário da Rede precisa estar vinculado a um parceiro.", momento: Date.now() };
+    return { erro: "Usuário do Canal precisa estar vinculado a um parceiro.", momento: Date.now() };
   }
 
   const r = await chamarFuncaoAdmin({ acao: "criar", ...dados.data });

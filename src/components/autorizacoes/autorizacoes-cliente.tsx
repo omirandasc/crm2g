@@ -58,7 +58,7 @@ function FormAutorizacao({
     <>
       <SecaoFormulario titulo="Quem vende o quê" />
       <CampoSelecao
-        rotulo="Parceiro da Rede"
+        rotulo="Canal"
         nome="parceiro_rede_id"
         obrigatorio
         opcoes={Object.fromEntries(parceiros.map((p) => [p.id, p.rotulo]))}

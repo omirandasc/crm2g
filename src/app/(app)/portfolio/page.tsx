@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { PortfolioCliente, type EmpresaLinha } from "@/components/portfolio/portfolio-cliente";
 
-export const metadata = { title: "Portfólio" };
+export const metadata = { title: "GovTechs" };
 
 export default async function PortfolioPage() {
   const supabase = await createClient();
@@ -16,9 +16,9 @@ export default async function PortfolioPage() {
   return (
     <div className="max-w-6xl space-y-5">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Portfólio</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">GovTechs</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Empresas donas dos produtos vendidos pelo ecossistema. Clique numa linha para editar.
+          Empresas donas dos produtos vendidos pelo ecossistema. Clique numa linha para abrir a ficha completa.
         </p>
       </div>
 

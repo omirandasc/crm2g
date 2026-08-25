@@ -18,6 +18,9 @@ import {
   MapPin,
   KeyRound,
   UsersRound,
+  ScrollText,
+  History,
+  BarChart3,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ehPortfolio, ehRede } from "@/lib/dominio";
@@ -32,6 +35,7 @@ function itensPorPerfil(perfil: string): { grupo: string; itens: Item[] }[] {
         itens: [
           { href: "/painel", rotulo: "Painel", icone: LayoutDashboard },
           { href: "/oportunidades", rotulo: "Funil de vendas", icone: Target },
+          { href: "/relatorios", rotulo: "Relatórios", icone: BarChart3 },
           { href: "/minha-area", rotulo: "Minha área", icone: Map },
           { href: "/produtos", rotulo: "Produtos autorizados", icone: Package },
         ],
@@ -42,6 +46,7 @@ function itensPorPerfil(perfil: string): { grupo: string; itens: Item[] }[] {
           { href: "/contratos", rotulo: "Contratos", icone: FileSignature },
           { href: "/entregas", rotulo: "Entregas", icone: Truck },
           { href: "/comissoes", rotulo: "Comissões", icone: Percent },
+          { href: "/politicas", rotulo: "Políticas", icone: ScrollText },
         ],
       },
     ];
@@ -49,13 +54,15 @@ function itensPorPerfil(perfil: string): { grupo: string; itens: Item[] }[] {
   if (ehPortfolio(perfil)) {
     return [
       {
-        grupo: "Portfólio",
+        grupo: "GovTech",
         itens: [
           { href: "/painel", rotulo: "Painel", icone: LayoutDashboard },
           { href: "/produtos", rotulo: "Meus produtos", icone: Package },
           { href: "/oportunidades", rotulo: "Funil dos produtos", icone: Target },
+          { href: "/relatorios", rotulo: "Relatórios", icone: BarChart3 },
           { href: "/contratos", rotulo: "Contratos", icone: FileSignature },
           { href: "/entregas", rotulo: "Entregas", icone: Truck },
+          { href: "/politicas", rotulo: "Políticas", icone: ScrollText },
         ],
       },
     ];
@@ -63,14 +70,17 @@ function itensPorPerfil(perfil: string): { grupo: string; itens: Item[] }[] {
   return [
     {
       grupo: "Visão geral",
-      itens: [{ href: "/painel", rotulo: "Painel", icone: LayoutDashboard }],
+      itens: [
+        { href: "/painel", rotulo: "Painel", icone: LayoutDashboard },
+        { href: "/relatorios", rotulo: "Relatórios", icone: BarChart3 },
+      ],
     },
     {
       grupo: "Cadastros",
       itens: [
-        { href: "/portfolio", rotulo: "Portfólio", icone: Building2 },
+        { href: "/portfolio", rotulo: "GovTechs", icone: Building2 },
         { href: "/produtos", rotulo: "Produtos", icone: Package },
-        { href: "/rede", rotulo: "Rede", icone: Store },
+        { href: "/rede", rotulo: "Canais", icone: Store },
         { href: "/autorizacoes", rotulo: "Autorizações", icone: KeyRound },
         { href: "/municipios", rotulo: "Municípios", icone: MapPin },
       ],
@@ -90,6 +100,8 @@ function itensPorPerfil(perfil: string): { grupo: string; itens: Item[] }[] {
         { href: "/comissoes", rotulo: "Comissões", icone: Percent },
         { href: "/entregas", rotulo: "Entregas", icone: Truck },
         { href: "/aprovacoes", rotulo: "Aprovações", icone: ShieldCheck },
+        { href: "/politicas", rotulo: "Políticas", icone: ScrollText },
+        { href: "/auditoria", rotulo: "Auditoria", icone: History },
         { href: "/usuarios", rotulo: "Usuários", icone: UsersRound },
       ],
     },

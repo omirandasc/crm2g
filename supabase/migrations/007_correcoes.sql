@@ -62,3 +62,8 @@ create policy ins_oportunidade_parceiro on public.oportunidades for insert to au
           and ae.status in ('ativa','em_implantacao','em_renovacao')
       )
     ));
+
+-- ── FK para o join historico_alteracoes → profiles (auditoria) ───
+alter table public.historico_alteracoes
+  add constraint historico_usuario_fkey
+  foreign key (usuario_responsavel) references public.profiles (id);

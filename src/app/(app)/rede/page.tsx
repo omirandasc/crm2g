@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { RedeCliente, type ParceiroLinha } from "@/components/rede/rede-cliente";
 
-export const metadata = { title: "Rede" };
+export const metadata = { title: "Canais" };
 
 export default async function RedePage() {
   const supabase = await createClient();
@@ -16,9 +16,9 @@ export default async function RedePage() {
   return (
     <div className="max-w-6xl space-y-5">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Rede</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">Canais</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Revendas e canais credenciados que vendem aos municípios. Clique numa linha para editar.
+          Revendas e canais credenciados que vendem aos municípios. Clique numa linha para abrir a ficha completa.
         </p>
       </div>
 

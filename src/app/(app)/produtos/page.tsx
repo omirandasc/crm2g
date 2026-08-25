@@ -28,7 +28,7 @@ export default async function ProdutosPage() {
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Produtos</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Catálogo de soluções do Portfólio. Clique numa linha para editar.
+          Catálogo de soluções das GovTechs. Clique numa linha para editar.
         </p>
       </div>
 

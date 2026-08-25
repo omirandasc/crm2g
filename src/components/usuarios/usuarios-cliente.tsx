@@ -62,14 +62,14 @@ export function UsuariosCliente({
   const CamposVinculo = ({ usuario }: { usuario?: UsuarioLinha | null }) => (
     <>
       <CampoSelecao
-        rotulo="Empresa do Portfólio (se perfil Portfólio)"
+        rotulo="GovTech (se perfil GovTech)"
         nome="empresa_portfolio_id"
         opcoes={Object.fromEntries(empresas.map((e) => [e.id, e.rotulo]))}
         valorInicial={usuario?.empresa_portfolio_id}
         permitirVazio
       />
       <CampoSelecao
-        rotulo="Parceiro da Rede (se perfil Rede)"
+        rotulo="Canal (se perfil Canal)"
         nome="parceiro_rede_id"
         opcoes={Object.fromEntries(parceiros.map((p) => [p.id, p.rotulo]))}
         valorInicial={usuario?.parceiro_rede_id}
