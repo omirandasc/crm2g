@@ -490,6 +490,7 @@ export function DetalheOportunidade({
         <input type="hidden" name="oportunidade_id" value={oportunidade.id} />
         <CampoTexto rotulo="Nome do órgão" nome="nome_orgao" obrigatorio placeholder="Ex.: Secretaria de Saúde" />
         <CampoSelecao rotulo="Tipo" nome="tipo_orgao" obrigatorio opcoes={TIPOS_ORGAO} valorInicial="prefeitura" />
+        <CampoTexto rotulo="Endereço" nome="endereco" placeholder="Rua, número, bairro, CEP" />
         <CampoTexto rotulo="Secretaria" nome="secretaria" />
         <CampoTexto rotulo="Responsável" nome="responsavel" />
         <div className="grid grid-cols-2 gap-3">

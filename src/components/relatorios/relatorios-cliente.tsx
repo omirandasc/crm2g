@@ -25,9 +25,11 @@ export type OportunidadeRelatorio = {
   id: string;
   etapa_comercial: string;
   valor_venda: number | null;
+  previsao_fechamento: string | null;
   produtos: {
     nome_produto: string;
     tipo_produto: string;
+    vertical: string | null;
     empresas_portfolio: { razao_social: string; nome_fantasia: string | null } | null;
   } | null;
   parceiros_rede: { razao_social: string; nome_fantasia: string | null } | null;
@@ -36,13 +38,26 @@ export type OportunidadeRelatorio = {
 
 const DIMENSOES: Record<string, string> = {
   fase: "Fase do funil",
+  mes: "Mês de fechamento",
   produto: "Produto",
   tipo: "Tipo de produto",
+  vertical: "Vertical",
   govtech: "GovTech",
   canal: "Canal",
   regiao: "Região do país",
   uf: "Estado (UF)",
 };
+
+const MESES = [
+  "jan", "fev", "mar", "abr", "mai", "jun",
+  "jul", "ago", "set", "out", "nov", "dez",
+];
+
+function mesDeFechamento(iso: string | null) {
+  if (!iso) return "Sem previsão";
+  const [ano, mes] = iso.slice(0, 7).split("-");
+  return `${MESES[Number(mes) - 1] ?? mes}/${ano}`;
+}
 
 function grupoDaEtapa(etapa: string) {
   return GRUPOS_FUNIL.find((g) => g.etapas.includes(etapa));
@@ -52,8 +67,12 @@ function chaveDimensao(o: OportunidadeRelatorio, dimensao: string): string {
   switch (dimensao) {
     case "fase":
       return grupoDaEtapa(o.etapa_comercial)?.rotulo ?? "Outra fase";
+    case "mes":
+      return mesDeFechamento(o.previsao_fechamento);
     case "produto":
       return o.produtos?.nome_produto ?? "Sem produto";
+    case "vertical":
+      return o.produtos?.vertical || "Sem vertical";
     case "tipo":
       return o.produtos
         ? TIPOS_PRODUTO[o.produtos.tipo_produto] ?? o.produtos.tipo_produto
@@ -114,6 +133,13 @@ export function RelatoriosCliente({
     if (dimensao === "fase") {
       const ordem = [...GRUPOS_FUNIL.map((g) => g.rotulo), "Outra fase"];
       resultado.sort((a, b) => ordem.indexOf(a.chave) - ordem.indexOf(b.chave));
+    } else if (dimensao === "mes") {
+      const posicao = (chave: string) => {
+        if (chave === "Sem previsão") return Number.MAX_SAFE_INTEGER;
+        const [mes, ano] = chave.split("/");
+        return Number(ano) * 12 + MESES.indexOf(mes);
+      };
+      resultado.sort((a, b) => posicao(a.chave) - posicao(b.chave));
     } else {
       resultado.sort((a, b) => b.valor - a.valor);
     }

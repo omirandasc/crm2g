@@ -179,6 +179,7 @@ const esquemaOrgao = z.object({
   oportunidade_id: texto,
   nome_orgao: obrigatorio("Informe o nome do órgão."),
   tipo_orgao: obrigatorio("Escolha o tipo."),
+  endereco: texto,
   secretaria: texto,
   responsavel: texto,
   email: texto,
