@@ -98,7 +98,7 @@ function FormAutorizacao({
           rotulo="Cidades preferenciais (máx.)"
           nome="qtd_max_municipios_preferenciais"
           tipo="number"
-          valorInicial={(autorizacao?.qtd_max_municipios_preferenciais ?? 10).toString()}
+          valorInicial={(autorizacao?.qtd_max_municipios_preferenciais ?? 20).toString()}
         />
         <CampoTexto
           rotulo="Proteção da oportunidade (dias)"

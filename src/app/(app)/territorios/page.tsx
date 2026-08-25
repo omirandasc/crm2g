@@ -38,7 +38,7 @@ export default async function TerritoriosPage() {
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Territórios</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Áreas preferenciais (prospecção, até 10 por parceiro) e exclusivas (contrato assinado).
+          Áreas preferenciais (prospecção, padrão de 20 por parceiro — ajustável na Autorização) e exclusivas (contrato assinado).
         </p>
       </div>
 

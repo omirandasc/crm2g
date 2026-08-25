@@ -68,8 +68,8 @@ export default async function MinhaAreaPage() {
   ]);
 
   const limite = Math.max(
-    10,
-    ...(autorizacoes ?? []).map((a) => a.qtd_max_municipios_preferenciais ?? 10)
+    20,
+    ...(autorizacoes ?? []).map((a) => a.qtd_max_municipios_preferenciais ?? 20)
   );
 
   return (

@@ -31,7 +31,7 @@ const esquemaAutorizacao = z.object({
   comissao_doisge: numero,
   comissao_parceiro: numero,
   qtd_max_municipios_preferenciais: z.preprocess(
-    (v) => (v === "" || v == null ? 10 : Number(v)),
+    (v) => (v === "" || v == null ? 20 : Number(v)),
     z.number().int().min(1, "O limite de municípios deve ser pelo menos 1.")
   ),
   prazo_protecao_oportunidade_dias: z.preprocess(

@@ -124,8 +124,9 @@ export function TerritoriosCliente({
               <Map className="mx-auto size-8 text-marca-600" strokeWidth={1.5} />
               <p className="mt-3 font-medium">Nenhuma área preferencial ainda</p>
               <p className="mt-1 text-sm text-muted-foreground">
-                Cada revenda mantém até 10 cidades preferenciais por produto. As
-                solicitações aparecem aqui para aprovação da Governança.
+                Cada Canal mantém até 20 cidades preferenciais por produto
+                (limite ajustável na Autorização). As solicitações aparecem
+                aqui para aprovação da Governança.
               </p>
             </div>
           ) : (
@@ -307,7 +308,7 @@ export function TerritoriosCliente({
         aberto={novaAberta}
         aoFechar={() => setNovaAberta(false)}
         titulo="Nova área preferencial"
-        descricao="Reserva de prioridade comercial: produto + parceiro + município. O limite padrão é de 10 cidades ativas por parceiro/produto."
+        descricao="Reserva de prioridade comercial: produto + parceiro + município. O limite padrão é de 20 cidades ativas por parceiro/produto (a Governança ajusta na Autorização)."
         acao={solicitarAreaPreferencial}
       >
         <SecaoFormulario titulo="Solicitação" />
