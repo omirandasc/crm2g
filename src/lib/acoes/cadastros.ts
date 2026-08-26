@@ -29,6 +29,7 @@ const esquemaEmpresa = z.object({
   uf: texto,
   segmento: texto,
   site: texto,
+  email_institucional: texto,
   status: obrigatorio("Escolha um status."),
   responsavel_principal: texto,
   email_responsavel: texto,

@@ -36,6 +36,7 @@ export type EmpresaLinha = {
   uf: string | null;
   segmento: string | null;
   site: string | null;
+  email_institucional: string | null;
   status: string;
   responsavel_principal: string | null;
   email_responsavel: string | null;
@@ -63,7 +64,16 @@ export function FormEmpresa({ empresa }: { empresa?: EmpresaLinha | null }) {
         <CampoTexto rotulo="Cidade" nome="cidade" valorInicial={empresa?.cidade} />
         <CampoUF nome="uf" valorInicial={empresa?.uf} />
       </div>
-      <CampoTexto rotulo="Site" nome="site" valorInicial={empresa?.site} placeholder="https://…" />
+      <div className="grid grid-cols-2 gap-3">
+        <CampoTexto rotulo="Site" nome="site" valorInicial={empresa?.site} placeholder="https://…" />
+        <CampoTexto
+          rotulo="E-mail institucional"
+          nome="email_institucional"
+          tipo="email"
+          valorInicial={empresa?.email_institucional}
+          placeholder="contato@empresa.com.br"
+        />
+      </div>
 
       <SecaoFormulario titulo="Responsável principal" />
       <CampoTexto rotulo="Nome" nome="responsavel_principal" valorInicial={empresa?.responsavel_principal} />

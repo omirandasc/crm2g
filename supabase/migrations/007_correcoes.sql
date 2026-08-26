@@ -103,3 +103,6 @@ end $$;
 update public.autorizacoes_parceiro_produto
   set qtd_max_municipios_preferenciais = 20
   where qtd_max_municipios_preferenciais = 10;
+
+-- ── E-mail institucional da GovTech ──────────────────────────────
+alter table public.empresas_portfolio add column email_institucional text;
