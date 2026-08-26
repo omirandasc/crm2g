@@ -15,8 +15,17 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://crm.doisge.tec.br"),
   title: { default: "CRM DOISGE", template: "%s · CRM DOISGE" },
   description: "Governança comercial B2G — DoisGe, GovTechs e Canais",
+  openGraph: {
+    title: "CRM DOISGE",
+    description: "Governança comercial B2G — DoisGe, GovTechs e Canais",
+    url: "https://crm.doisge.tec.br",
+    siteName: "CRM DOISGE",
+    locale: "pt_BR",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
