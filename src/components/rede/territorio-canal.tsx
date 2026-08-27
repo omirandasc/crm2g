@@ -119,7 +119,9 @@ export function TerritorioCanal({
             <CardDescription>
               {ativas > 0
                 ? `${ativas} cidade(s) ativa(s) no território deste Canal.`
-                : "Nenhuma cidade preferencial ainda — adicione ao lado."}
+                : preferenciais.length > 0
+                  ? "Nenhuma cidade ativa ainda — há solicitações do Canal aguardando decisão em Territórios."
+                  : "Nenhuma cidade preferencial ainda — adicione ao lado."}
             </CardDescription>
           </CardHeader>
           {preferenciais.length > 0 && (
