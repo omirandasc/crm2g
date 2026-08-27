@@ -19,13 +19,33 @@ export function FiltrosMunicipios() {
   const params = useSearchParams();
   const [busca, setBusca] = React.useState(params.get("q") ?? "");
   const [uf, setUf] = React.useState(params.get("uf") ?? "todas");
+  const [filtrando, startFiltro] = React.useTransition();
 
-  const aplicar = (novaBusca: string, novaUf: string) => {
+  const montarUrl = (novaBusca: string, novaUf: string) => {
     const p = new URLSearchParams();
     if (novaBusca) p.set("q", novaBusca);
     if (novaUf && novaUf !== "todas") p.set("uf", novaUf);
-    router.push(`/municipios?${p.toString()}`);
+    return `/municipios?${p.toString()}`;
   };
+
+  // Enter / troca de UF: fixa o filtro (entra no histórico, dá para copiar o link)
+  const aplicar = (novaBusca: string, novaUf: string) => {
+    startFiltro(() => router.push(montarUrl(novaBusca, novaUf)));
+  };
+
+  // Digitação: filtra ao vivo com debounce, sem poluir o histórico
+  const primeiraRenderizacao = React.useRef(true);
+  React.useEffect(() => {
+    if (primeiraRenderizacao.current) {
+      primeiraRenderizacao.current = false;
+      return;
+    }
+    const t = setTimeout(() => {
+      startFiltro(() => router.replace(montarUrl(busca, uf), { scroll: false }));
+    }, 400);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [busca]);
 
   const temFiltro = busca !== "" || uf !== "todas";
 
@@ -43,9 +63,12 @@ export function FiltrosMunicipios() {
           type="search"
           value={busca}
           onChange={(e) => setBusca(e.target.value)}
-          placeholder="Buscar município pelo nome…"
+          placeholder="Digite o nome do município — a lista filtra sozinha…"
           className="pl-8"
         />
+        {filtrando && (
+          <span className="absolute right-2.5 top-1/2 size-3.5 -translate-y-1/2 animate-spin rounded-full border-2 border-marca-600 border-t-transparent" />
+        )}
       </div>
 
       <Select
@@ -68,10 +91,6 @@ export function FiltrosMunicipios() {
           ))}
         </SelectContent>
       </Select>
-
-      <Button type="submit" variant="secondary">
-        Filtrar
-      </Button>
 
       {temFiltro && (
         <Button
