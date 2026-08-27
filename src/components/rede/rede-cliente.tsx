@@ -20,6 +20,7 @@ import {
   CampoTextoLongo,
   CampoSelecao,
   CampoUF,
+  CampoUFsMultiplas,
   SecaoFormulario,
 } from "@/components/cadastros/campos";
 import {
@@ -39,6 +40,7 @@ export type ParceiroLinha = {
   cidade: string | null;
   uf: string | null;
   uf_credenciamento: string | null;
+  ufs_credenciamento: string[] | null;
   limite_cidades_preferenciais: number | null;
   responsavel_principal: string | null;
   email_responsavel: string | null;
@@ -66,8 +68,17 @@ export function FormParceiro({ parceiro }: { parceiro?: ParceiroLinha | null }) 
       <div className="grid grid-cols-3 gap-3">
         <CampoTexto rotulo="Cidade" nome="cidade" valorInicial={parceiro?.cidade} />
         <CampoUF nome="uf" valorInicial={parceiro?.uf} />
-        <CampoUF rotulo="UF de credenciamento" nome="uf_credenciamento" valorInicial={parceiro?.uf_credenciamento} />
       </div>
+      <CampoUFsMultiplas
+        nome="ufs_credenciamento"
+        valorInicial={
+          parceiro?.ufs_credenciamento?.length
+            ? parceiro.ufs_credenciamento
+            : parceiro?.uf_credenciamento
+              ? [parceiro.uf_credenciamento]
+              : []
+        }
+      />
       <CampoTexto
         rotulo="Carteira de cidades preferenciais (limite sem contrato fechado)"
         nome="limite_cidades_preferenciais"
@@ -171,7 +182,9 @@ export function RedeCliente({ parceiros }: { parceiros: ParceiroLinha[] }) {
                     {TIPOS_PARCEIRO[p.tipo_parceiro] ?? p.tipo_parceiro}
                   </TableCell>
                   <TableCell className="hidden sm:table-cell">
-                    {p.uf_credenciamento ?? "—"}
+                    {p.ufs_credenciamento?.length
+                      ? p.ufs_credenciamento.join(", ")
+                      : p.uf_credenciamento ?? "—"}
                   </TableCell>
                   <TableCell className="hidden lg:table-cell text-muted-foreground">
                     {p.responsavel_principal ?? "—"}

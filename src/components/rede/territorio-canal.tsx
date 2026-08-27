@@ -59,12 +59,14 @@ export type ExclusivaLinha = {
 export function TerritorioCanal({
   parceiroId,
   limite,
+  ufs,
   produtos,
   preferenciais,
   exclusivas,
 }: {
   parceiroId: string;
   limite: number;
+  ufs: string[];
   produtos: Opcao[];
   preferenciais: AreaLinha[];
   exclusivas: ExclusivaLinha[];
@@ -109,7 +111,12 @@ export function TerritorioCanal({
                   opcoes={Object.fromEntries(produtos.map((p) => [p.id, p.rotulo]))}
                   valorInicial={produtos.length === 1 ? produtos[0].id : undefined}
                 />
-                <CampoMunicipio nome="municipio_id" obrigatorio />
+                <CampoMunicipio
+                  nome="municipio_id"
+                  obrigatorio
+                  ufs={ufs}
+                  rotulo={ufs.length > 0 ? `Município (${ufs.join(", ")})` : "Município"}
+                />
               </div>
             </FormAcao>
           )}

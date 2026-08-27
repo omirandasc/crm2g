@@ -123,7 +123,14 @@ const esquemaParceiro = z.object({
   status: obrigatorio("Escolha um status."),
   cidade: texto,
   uf: texto,
-  uf_credenciamento: texto,
+  ufs_credenciamento: z.preprocess(
+    (v) =>
+      String(v ?? "")
+        .split(",")
+        .map((s) => s.trim().toUpperCase())
+        .filter((s) => /^[A-Z]{2}$/.test(s)),
+    z.array(z.string())
+  ),
   limite_cidades_preferenciais: z.preprocess(
     (v) => (v === "" || v == null ? 30 : Number(v)),
     z.number().int().min(1, "O limite da carteira deve ser pelo menos 1.")
@@ -149,7 +156,12 @@ export async function salvarParceiro(
   }
 
   const { id, banco, agencia, conta, chave_pix, ...resto } = dados.data;
-  const campos = { ...resto, dados_bancarios: { banco, agencia, conta, chave_pix } };
+  const campos = {
+    ...resto,
+    // legado: primeira UF mantida na coluna antiga para compatibilidade
+    uf_credenciamento: resto.ufs_credenciamento[0] ?? null,
+    dados_bancarios: { banco, agencia, conta, chave_pix },
+  };
   const supabase = await createClient();
 
   const { error } = id

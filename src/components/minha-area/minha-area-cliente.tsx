@@ -41,12 +41,14 @@ export type MinhaAreaExclusiva = {
 export function MinhaAreaCliente({
   parceiroId,
   limite,
+  ufs,
   preferenciais,
   exclusivas,
   produtosAutorizados,
 }: {
   parceiroId: string;
   limite: number;
+  ufs: string[];
   preferenciais: MinhaAreaPreferencial[];
   exclusivas: MinhaAreaExclusiva[];
   produtosAutorizados: Opcao[];
@@ -209,7 +211,12 @@ export function MinhaAreaCliente({
           obrigatorio
           opcoes={Object.fromEntries(produtosAutorizados.map((p) => [p.id, p.rotulo]))}
         />
-        <CampoMunicipio nome="municipio_id" obrigatorio />
+        <CampoMunicipio
+          nome="municipio_id"
+          obrigatorio
+          ufs={ufs}
+          rotulo={ufs.length > 0 ? `Município (credenciado em ${ufs.join(", ")})` : "Município"}
+        />
         <CampoTextoLongo
           rotulo="Justificativa"
           nome="justificativa"

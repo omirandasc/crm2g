@@ -28,11 +28,14 @@ export function CampoMunicipio({
   nome,
   obrigatorio,
   valorInicial,
+  ufs,
 }: {
   rotulo?: string;
   nome: string;
   obrigatorio?: boolean;
   valorInicial?: { id: string; nome: string; uf: string } | null;
+  /** Restringe a busca a estas UFs (ex.: UFs de credenciamento do Canal). */
+  ufs?: string[] | null;
 }) {
   const [aberto, setAberto] = React.useState(false);
   const [busca, setBusca] = React.useState("");
@@ -51,11 +54,13 @@ export function CampoMunicipio({
         .order("populacao", { ascending: false, nullsFirst: false })
         .limit(15);
       if (busca) consulta = consulta.ilike("nome", `${busca}%`);
+      if (ufs && ufs.length > 0) consulta = consulta.in("uf", ufs);
       const { data } = await consulta;
       setOpcoes(data ?? []);
     }, 250);
     return () => clearTimeout(t);
-  }, [busca, aberto]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [busca, aberto, ufs?.join(",")]);
 
   return (
     <div className="space-y-1.5">

@@ -1,5 +1,6 @@
 "use client";
 
+import * as React from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -135,6 +136,56 @@ export function CampoUF({
       rotuloVazio="—"
       opcoes={Object.fromEntries(UFS.map((s) => [s, s]))}
     />
+  );
+}
+
+/** Seleção de várias UFs por chips clicáveis; envia CSV num input oculto. */
+export function CampoUFsMultiplas({
+  rotulo = "UFs de credenciamento",
+  nome,
+  valorInicial,
+}: {
+  rotulo?: string;
+  nome: string;
+  valorInicial?: string[] | null;
+}) {
+  const [selecionadas, setSelecionadas] = React.useState<string[]>(valorInicial ?? []);
+
+  const alternar = (sigla: string) =>
+    setSelecionadas((atual) =>
+      atual.includes(sigla) ? atual.filter((s) => s !== sigla) : [...atual, sigla].sort()
+    );
+
+  return (
+    <div className="space-y-1.5">
+      <Label>{rotulo}</Label>
+      <input type="hidden" name={nome} value={selecionadas.join(",")} />
+      <div className="flex flex-wrap gap-1">
+        {UFS.map((sigla) => {
+          const ativa = selecionadas.includes(sigla);
+          return (
+            <button
+              key={sigla}
+              type="button"
+              onClick={() => alternar(sigla)}
+              aria-pressed={ativa}
+              className={
+                ativa
+                  ? "rounded-md bg-marca-600 px-2 py-1 font-mono text-xs font-semibold text-white"
+                  : "rounded-md border border-border px-2 py-1 font-mono text-xs text-muted-foreground hover:border-marca-600/50 hover:text-foreground"
+              }
+            >
+              {sigla}
+            </button>
+          );
+        })}
+      </div>
+      <p className="text-xs text-muted-foreground">
+        {selecionadas.length > 0
+          ? `Credenciado em: ${selecionadas.join(", ")}`
+          : "Nenhuma UF selecionada — sem restrição de cidades."}
+      </p>
+    </div>
   );
 }
 

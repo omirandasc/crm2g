@@ -21,6 +21,7 @@ import { salvarEmpresa, salvarParceiro } from "@/lib/acoes/cadastros";
 
 export type TerritorioFicha = {
   limite: number;
+  ufs: string[];
   produtos: Opcao[];
   preferenciais: AreaLinha[];
   exclusivas: ExclusivaLinha[];
@@ -102,6 +103,7 @@ export function FichaEntidade({
           <TerritorioCanal
             parceiroId={registroId}
             limite={territorio.limite}
+            ufs={territorio.ufs}
             produtos={territorio.produtos}
             preferenciais={territorio.preferenciais}
             exclusivas={territorio.exclusivas}

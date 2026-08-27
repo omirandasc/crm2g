@@ -193,3 +193,55 @@ create policy ins_area_pref_parceiro on public.areas_preferenciais for insert to
   with check (parceiro_rede_id = fn_meu_parceiro()
     and status in ('solicitada','ativa')
     and fn_produto_autorizado(produto_id));
+
+-- ── Múltiplas UFs de credenciamento + cidade dentro das UFs ──────
+alter table public.parceiros_rede
+  add column ufs_credenciamento text[] not null default '{}';
+
+update public.parceiros_rede
+  set ufs_credenciamento = array[uf_credenciamento]
+  where uf_credenciamento is not null and uf_credenciamento <> '';
+
+create or replace function public.fn_validar_limite_area_preferencial()
+returns trigger language plpgsql as $$
+declare
+  v_limite integer;
+  v_atual integer;
+  v_exclusiva integer;
+  v_ufs text[];
+  v_uf_municipio text;
+begin
+  if new.status in ('aprovada','ativa') then
+    select count(*) into v_exclusiva
+      from public.areas_exclusivas
+      where produto_id = new.produto_id
+        and municipio_id = new.municipio_id
+        and status in ('ativa','em_implantacao','em_renovacao','mantida_por_direito_economico');
+    if v_exclusiva > 0 then
+      raise exception 'Esta cidade já é exclusiva de um Canal para este produto.';
+    end if;
+
+    select coalesce(ufs_credenciamento, '{}'), coalesce(limite_cidades_preferenciais, 30)
+      into v_ufs, v_limite
+      from public.parceiros_rede
+      where id = new.parceiro_rede_id;
+
+    if array_length(v_ufs, 1) is not null then
+      select uf into v_uf_municipio from public.municipios where id = new.municipio_id;
+      if not (v_uf_municipio = any(v_ufs)) then
+        raise exception 'Cidade fora das UFs de credenciamento deste Canal (%).', array_to_string(v_ufs, ', ');
+      end if;
+    end if;
+
+    select count(*) into v_atual
+      from public.areas_preferenciais
+      where parceiro_rede_id = new.parceiro_rede_id
+        and status in ('aprovada','ativa')
+        and id <> new.id;
+
+    if v_atual >= v_limite then
+      raise exception 'Carteira cheia: o limite é de % cidades preferenciais sem contrato fechado. Feche contrato numa delas para abrir vaga.', v_limite;
+    end if;
+  end if;
+  return new;
+end $$;

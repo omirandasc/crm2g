@@ -77,7 +77,11 @@ export default async function CanalDetalhePage({
           </h1>
           <p className="mt-0.5 text-sm text-muted-foreground">
             Canal · {TIPOS_PARCEIRO[parceiro.tipo_parceiro] ?? parceiro.tipo_parceiro}
-            {parceiro.uf_credenciamento && ` · credenciado em ${parceiro.uf_credenciamento}`}
+            {(parceiro.ufs_credenciamento?.length
+              ? ` · credenciado em ${parceiro.ufs_credenciamento.join(", ")}`
+              : parceiro.uf_credenciamento
+                ? ` · credenciado em ${parceiro.uf_credenciamento}`
+                : "")}
           </p>
         </div>
         <Pilula tom={TOM_STATUS_PARCEIRO[parceiro.status] ?? "neutro"}>
@@ -92,6 +96,7 @@ export default async function CanalDetalhePage({
         certidoes={(certidoes ?? []) as CertidaoLinha[]}
         territorio={{
           limite: (parceiro as { limite_cidades_preferenciais?: number }).limite_cidades_preferenciais ?? 30,
+          ufs: (parceiro as { ufs_credenciamento?: string[] }).ufs_credenciamento ?? [],
           produtos: (autorizacoes ?? []).map((a) => ({
             id: a.produto_id,
             rotulo:

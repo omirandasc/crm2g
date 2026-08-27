@@ -53,7 +53,7 @@ export default async function MinhaAreaPage() {
   ] = await Promise.all([
     supabase
       .from("parceiros_rede")
-      .select("limite_cidades_preferenciais")
+      .select("limite_cidades_preferenciais, ufs_credenciamento")
       .eq("id", perfil.parceiro_rede_id)
       .single(),
     supabase
@@ -87,6 +87,7 @@ export default async function MinhaAreaPage() {
       <MinhaAreaCliente
         parceiroId={parceiroId}
         limite={limite}
+        ufs={parceiro?.ufs_credenciamento ?? []}
         preferenciais={(preferenciais ?? []) as unknown as MinhaAreaPreferencial[]}
         exclusivas={(exclusivas ?? []) as unknown as MinhaAreaExclusiva[]}
         produtosAutorizados={(autorizacoes ?? []).map((a) => {
