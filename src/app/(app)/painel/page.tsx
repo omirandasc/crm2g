@@ -190,7 +190,7 @@ export default async function PainelPage() {
               <div className="flex items-start gap-3">
                 <SeloTerritorio status="preferencial" className="mt-0.5 shrink-0" />
                 <p className="text-muted-foreground">
-                  Reservada para prospecção — cada Canal mantém até 20 cidades (a Governança pode ajustar).
+                  Reservada para prospecção — a carteira do Canal comporta 30 cidades sem contrato fechado.
                 </p>
               </div>
               <div className="flex items-start gap-3">

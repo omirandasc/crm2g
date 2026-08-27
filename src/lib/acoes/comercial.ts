@@ -152,6 +152,51 @@ export async function decidirAreaPreferencial(
   return { ok: true, momento: Date.now() };
 }
 
+// O Canal escolhe uma cidade da vaga aberta — entra ativa na hora, sem aprovação
+export async function escolherCidadePreferencial(
+  _prev: ResultadoAcao,
+  formData: FormData
+): Promise<ResultadoAcao> {
+  const dados = esquemaArea.safeParse(Object.fromEntries(formData));
+  if (!dados.success) {
+    return { erro: dados.error.issues[0].message, momento: Date.now() };
+  }
+
+  const supabase = await createClient();
+  const { id: _id, ...campos } = dados.data;
+
+  const { error } = await supabase.from("areas_preferenciais").insert({
+    ...campos,
+    status: "ativa",
+    data_aprovacao: new Date().toISOString(),
+    data_inicio: new Date().toISOString().slice(0, 10),
+    justificativa: campos.justificativa ?? "Escolhida pelo Canal (vaga da carteira)",
+  });
+
+  if (error) {
+    if (error.code === "23505") {
+      return {
+        erro: "Este município já é preferencial de outro Canal para este produto.",
+        momento: Date.now(),
+      };
+    }
+    if (error.message.includes("Carteira cheia") || error.message.includes("exclusiva de um Canal")) {
+      return { erro: error.message, momento: Date.now() };
+    }
+    if (error.code === "42501" || error.message.includes("row-level security")) {
+      return {
+        erro: "Sem permissão: só é possível escolher cidades para produtos com autorização ativa.",
+        momento: Date.now(),
+      };
+    }
+    return { erro: error.message, momento: Date.now() };
+  }
+
+  revalidatePath("/minha-area");
+  revalidatePath("/territorios");
+  return { ok: true, momento: Date.now() };
+}
+
 // A Governança define uma cidade preferencial diretamente (já nasce ativa)
 export async function definirAreaPreferencial(
   _prev: ResultadoAcao,

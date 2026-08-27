@@ -20,6 +20,7 @@ import type { Opcao } from "@/components/autorizacoes/autorizacoes-cliente";
 import { salvarEmpresa, salvarParceiro } from "@/lib/acoes/cadastros";
 
 export type TerritorioFicha = {
+  limite: number;
   produtos: Opcao[];
   preferenciais: AreaLinha[];
   exclusivas: ExclusivaLinha[];
@@ -100,6 +101,7 @@ export function FichaEntidade({
         <TabsContent value="territorio" className="mt-4">
           <TerritorioCanal
             parceiroId={registroId}
+            limite={territorio.limite}
             produtos={territorio.produtos}
             preferenciais={territorio.preferenciais}
             exclusivas={territorio.exclusivas}

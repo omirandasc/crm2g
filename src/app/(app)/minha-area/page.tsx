@@ -46,10 +46,16 @@ export default async function MinhaAreaPage() {
   const parceiroId = perfil.parceiro_rede_id;
 
   const [
+    { data: parceiro },
     { data: preferenciais },
     { data: exclusivas },
     { data: autorizacoes },
   ] = await Promise.all([
+    supabase
+      .from("parceiros_rede")
+      .select("limite_cidades_preferenciais")
+      .eq("id", perfil.parceiro_rede_id)
+      .single(),
     supabase
       .from("areas_preferenciais")
       .select("id, status, data_solicitacao, produtos ( nome_produto ), municipios ( nome, uf )")
@@ -67,10 +73,7 @@ export default async function MinhaAreaPage() {
       .eq("status", "ativa"),
   ]);
 
-  const limite = Math.max(
-    20,
-    ...(autorizacoes ?? []).map((a) => a.qtd_max_municipios_preferenciais ?? 20)
-  );
+  const limite = parceiro?.limite_cidades_preferenciais ?? 30;
 
   return (
     <div className="max-w-6xl space-y-5">

@@ -39,6 +39,7 @@ export type ParceiroLinha = {
   cidade: string | null;
   uf: string | null;
   uf_credenciamento: string | null;
+  limite_cidades_preferenciais: number | null;
   responsavel_principal: string | null;
   email_responsavel: string | null;
   telefone_responsavel: string | null;
@@ -67,6 +68,12 @@ export function FormParceiro({ parceiro }: { parceiro?: ParceiroLinha | null }) 
         <CampoUF nome="uf" valorInicial={parceiro?.uf} />
         <CampoUF rotulo="UF de credenciamento" nome="uf_credenciamento" valorInicial={parceiro?.uf_credenciamento} />
       </div>
+      <CampoTexto
+        rotulo="Carteira de cidades preferenciais (limite sem contrato fechado)"
+        nome="limite_cidades_preferenciais"
+        tipo="number"
+        valorInicial={(parceiro?.limite_cidades_preferenciais ?? 30).toString()}
+      />
 
       <SecaoFormulario titulo="Contatos" />
       <div className="grid grid-cols-2 gap-3">

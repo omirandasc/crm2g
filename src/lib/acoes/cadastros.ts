@@ -124,6 +124,10 @@ const esquemaParceiro = z.object({
   cidade: texto,
   uf: texto,
   uf_credenciamento: texto,
+  limite_cidades_preferenciais: z.preprocess(
+    (v) => (v === "" || v == null ? 30 : Number(v)),
+    z.number().int().min(1, "O limite da carteira deve ser pelo menos 1.")
+  ),
   responsavel_principal: texto,
   email_responsavel: texto,
   telefone_responsavel: texto,

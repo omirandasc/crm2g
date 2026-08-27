@@ -91,6 +91,7 @@ export default async function CanalDetalhePage({
         socios={(socios ?? []) as SocioLinha[]}
         certidoes={(certidoes ?? []) as CertidaoLinha[]}
         territorio={{
+          limite: (parceiro as { limite_cidades_preferenciais?: number }).limite_cidades_preferenciais ?? 30,
           produtos: (autorizacoes ?? []).map((a) => ({
             id: a.produto_id,
             rotulo:

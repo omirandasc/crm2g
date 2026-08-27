@@ -149,3 +149,47 @@ begin
   end if;
   return new;
 end $$;
+
+-- ── Carteira de 30 cidades por Canal (sem contrato fechado) ──────
+alter table public.parceiros_rede
+  add column limite_cidades_preferenciais integer not null default 30;
+
+create or replace function public.fn_validar_limite_area_preferencial()
+returns trigger language plpgsql as $$
+declare
+  v_limite integer;
+  v_atual integer;
+  v_exclusiva integer;
+begin
+  if new.status in ('aprovada','ativa') then
+    select count(*) into v_exclusiva
+      from public.areas_exclusivas
+      where produto_id = new.produto_id
+        and municipio_id = new.municipio_id
+        and status in ('ativa','em_implantacao','em_renovacao','mantida_por_direito_economico');
+    if v_exclusiva > 0 then
+      raise exception 'Esta cidade já é exclusiva de um Canal para este produto.';
+    end if;
+
+    select coalesce(limite_cidades_preferenciais, 30) into v_limite
+      from public.parceiros_rede
+      where id = new.parceiro_rede_id;
+
+    select count(*) into v_atual
+      from public.areas_preferenciais
+      where parceiro_rede_id = new.parceiro_rede_id
+        and status in ('aprovada','ativa')
+        and id <> new.id;
+
+    if v_atual >= v_limite then
+      raise exception 'Carteira cheia: o limite é de % cidades preferenciais sem contrato fechado. Feche contrato numa delas para abrir vaga.', v_limite;
+    end if;
+  end if;
+  return new;
+end $$;
+
+drop policy ins_area_pref_parceiro on public.areas_preferenciais;
+create policy ins_area_pref_parceiro on public.areas_preferenciais for insert to authenticated
+  with check (parceiro_rede_id = fn_meu_parceiro()
+    and status in ('solicitada','ativa')
+    and fn_produto_autorizado(produto_id));

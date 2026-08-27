@@ -58,11 +58,13 @@ export type ExclusivaLinha = {
 
 export function TerritorioCanal({
   parceiroId,
+  limite,
   produtos,
   preferenciais,
   exclusivas,
 }: {
   parceiroId: string;
+  limite: number;
   produtos: Opcao[];
   preferenciais: AreaLinha[];
   exclusivas: ExclusivaLinha[];
@@ -84,8 +86,10 @@ export function TerritorioCanal({
         <CardHeader>
           <CardTitle>Adicionar cidade preferencial</CardTitle>
           <CardDescription>
-            A cidade entra direto como <strong>ativa</strong>, sem passar por
-            solicitação. A Governança tem autonomia total na quantidade.
+            A cidade entra direto como <strong>ativa</strong>. A carteira comporta{" "}
+            <strong>{limite} cidades sem contrato fechado</strong> (todos os
+            produtos somados) — o limite vale para todos e é ajustável no
+            cadastro do Canal.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -118,7 +122,7 @@ export function TerritorioCanal({
             <CardTitle>Cidades preferenciais</CardTitle>
             <CardDescription>
               {ativas > 0
-                ? `${ativas} cidade(s) ativa(s) no território deste Canal.`
+                ? `${ativas} de ${limite} vagas da carteira em uso.`
                 : preferenciais.length > 0
                   ? "Nenhuma cidade ativa ainda — há solicitações do Canal aguardando decisão em Territórios."
                   : "Nenhuma cidade preferencial ainda — adicione ao lado."}

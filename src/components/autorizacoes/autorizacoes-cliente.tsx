@@ -93,13 +93,11 @@ function FormAutorizacao({
       </div>
 
       <SecaoFormulario titulo="Território e proteção" />
+      <p className="text-xs text-muted-foreground">
+        O limite da carteira de cidades (padrão 30, todos os produtos somados)
+        fica no cadastro do Canal, no menu Canais.
+      </p>
       <div className="grid grid-cols-2 gap-3">
-        <CampoTexto
-          rotulo="Cidades preferenciais (máx.)"
-          nome="qtd_max_municipios_preferenciais"
-          tipo="number"
-          valorInicial={(autorizacao?.qtd_max_municipios_preferenciais ?? 20).toString()}
-        />
         <CampoTexto
           rotulo="Proteção da oportunidade (dias)"
           nome="prazo_protecao_oportunidade_dias"
@@ -162,7 +160,6 @@ export function AutorizacoesCliente({
                 <TableHead>Produto</TableHead>
                 <TableHead className="hidden md:table-cell text-right">Venda sugerida</TableHead>
                 <TableHead className="hidden lg:table-cell text-right">Comissões (2G/Parc.)</TableHead>
-                <TableHead className="hidden sm:table-cell text-center">Cidades</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="w-10" />
               </TableRow>
@@ -179,9 +176,6 @@ export function AutorizacoesCliente({
                   </TableCell>
                   <TableCell className="hidden lg:table-cell text-right font-mono tabular-nums">
                     {a.comissao_doisge ?? "—"}% / {a.comissao_parceiro ?? "—"}%
-                  </TableCell>
-                  <TableCell className="hidden sm:table-cell text-center">
-                    {a.qtd_max_municipios_preferenciais}
                   </TableCell>
                   <TableCell>
                     <Pilula tom={TOM_STATUS_AUTORIZACAO[a.status] ?? "neutro"}>

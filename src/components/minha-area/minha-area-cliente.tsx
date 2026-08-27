@@ -17,7 +17,7 @@ import { Pilula, SeloTerritorio } from "@/components/selo-territorio";
 import { PainelFormulario } from "@/components/cadastros/painel-formulario";
 import { CampoSelecao, CampoTextoLongo } from "@/components/cadastros/campos";
 import { CampoMunicipio } from "@/components/cadastros/campo-municipio";
-import { solicitarAreaPreferencial } from "@/lib/acoes/comercial";
+import { escolherCidadePreferencial } from "@/lib/acoes/comercial";
 import { STATUS_AREA_PREFERENCIAL, TOM_STATUS_AREA } from "@/lib/dominio";
 import { formatarData } from "@/lib/utils";
 import type { Opcao } from "@/components/autorizacoes/autorizacoes-cliente";
@@ -88,7 +88,7 @@ export function MinhaAreaCliente({
           disabled={produtosAutorizados.length === 0 || vagas === 0}
         >
           <Plus className="size-4" />
-          Solicitar nova cidade
+          Escolher nova cidade
         </Button>
       </div>
 
@@ -110,8 +110,9 @@ export function MinhaAreaCliente({
               <Map className="mx-auto size-8 text-marca-600" strokeWidth={1.5} />
               <p className="mt-3 font-medium">Escolha suas cidades</p>
               <p className="mt-1 text-sm text-muted-foreground">
-                Você tem direito a {limite} cidades preferenciais para prospecção.
-                Quando fechar contrato numa delas, ela vira exclusiva e abre uma vaga.
+                Sua carteira comporta {limite} cidades sem contrato fechado, somando
+                todos os produtos. Fechou contrato numa delas? Ela vira exclusiva e
+                abre uma vaga para você escolher outra.
               </p>
             </div>
           ) : (
@@ -197,9 +198,9 @@ export function MinhaAreaCliente({
       <PainelFormulario
         aberto={solicitarAberto}
         aoFechar={() => setSolicitarAberto(false)}
-        titulo="Solicitar cidade preferencial"
-        descricao="A solicitação vai para aprovação da DoisGe (Governança)."
-        acao={solicitarAreaPreferencial}
+        titulo="Escolher cidade preferencial"
+        descricao="A cidade entra ativa na hora, ocupando uma vaga da sua carteira. Só cidades livres podem ser escolhidas."
+        acao={escolherCidadePreferencial}
       >
         <input type="hidden" name="parceiro_rede_id" value={parceiroId} />
         <CampoSelecao
