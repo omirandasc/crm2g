@@ -11,7 +11,19 @@ import {
 } from "@/components/cadastros/socios-certidoes";
 import { FormEmpresa, type EmpresaLinha } from "@/components/portfolio/portfolio-cliente";
 import { FormParceiro, type ParceiroLinha } from "@/components/rede/rede-cliente";
+import {
+  TerritorioCanal,
+  type AreaLinha,
+  type ExclusivaLinha,
+} from "@/components/rede/territorio-canal";
+import type { Opcao } from "@/components/autorizacoes/autorizacoes-cliente";
 import { salvarEmpresa, salvarParceiro } from "@/lib/acoes/cadastros";
+
+export type TerritorioFicha = {
+  produtos: Opcao[];
+  preferenciais: AreaLinha[];
+  exclusivas: ExclusivaLinha[];
+};
 
 export function FichaEntidade({
   entidade,
@@ -19,12 +31,14 @@ export function FichaEntidade({
   parceiro,
   socios,
   certidoes,
+  territorio,
 }: {
   entidade: "empresa_portfolio" | "parceiro_rede";
   empresa?: EmpresaLinha | null;
   parceiro?: ParceiroLinha | null;
   socios: SocioLinha[];
   certidoes: CertidaoLinha[];
+  territorio?: TerritorioFicha | null;
 }) {
   const registroId = (empresa?.id ?? parceiro?.id)!;
 
@@ -40,6 +54,16 @@ export function FichaEntidade({
           Certidões
           {certidoes.length > 0 && <span className="ml-1 text-xs text-muted-foreground">{certidoes.length}</span>}
         </TabsTrigger>
+        {territorio && (
+          <TabsTrigger value="territorio">
+            Território
+            {territorio.preferenciais.length > 0 && (
+              <span className="ml-1 text-xs text-muted-foreground">
+                {territorio.preferenciais.length}
+              </span>
+            )}
+          </TabsTrigger>
+        )}
       </TabsList>
 
       <TabsContent value="dados" className="mt-4">
@@ -71,6 +95,17 @@ export function FichaEntidade({
       <TabsContent value="certidoes" className="mt-4">
         <BlocoCertidoes entidade={entidade} entidadeId={registroId} certidoes={certidoes} />
       </TabsContent>
+
+      {territorio && (
+        <TabsContent value="territorio" className="mt-4">
+          <TerritorioCanal
+            parceiroId={registroId}
+            produtos={territorio.produtos}
+            preferenciais={territorio.preferenciais}
+            exclusivas={territorio.exclusivas}
+          />
+        </TabsContent>
+      )}
     </Tabs>
   );
 }

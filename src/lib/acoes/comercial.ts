@@ -152,6 +152,64 @@ export async function decidirAreaPreferencial(
   return { ok: true, momento: Date.now() };
 }
 
+// A Governança define uma cidade preferencial diretamente (já nasce ativa)
+export async function definirAreaPreferencial(
+  _prev: ResultadoAcao,
+  formData: FormData
+): Promise<ResultadoAcao> {
+  const dados = esquemaArea.safeParse(Object.fromEntries(formData));
+  if (!dados.success) {
+    return { erro: dados.error.issues[0].message, momento: Date.now() };
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const { id: _id, ...campos } = dados.data;
+  const { error } = await supabase.from("areas_preferenciais").insert({
+    ...campos,
+    status: "ativa",
+    data_aprovacao: new Date().toISOString(),
+    aprovado_por: user?.id ?? null,
+    data_inicio: new Date().toISOString().slice(0, 10),
+    justificativa: campos.justificativa ?? "Território definido pela Governança",
+  });
+
+  if (error) {
+    if (error.code === "23505") {
+      return {
+        erro: "Este município já é preferencial de outro Canal para este produto.",
+        momento: Date.now(),
+      };
+    }
+    return { erro: error.message, momento: Date.now() };
+  }
+
+  revalidatePath(`/rede/${dados.data.parceiro_rede_id}`);
+  revalidatePath("/territorios");
+  return { ok: true, momento: Date.now() };
+}
+
+// A Governança remove uma cidade da ficha do Canal (vira cancelada, com rastro)
+export async function removerAreaDaFicha(
+  areaId: string,
+  parceiroId: string
+): Promise<ResultadoAcao> {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("areas_preferenciais")
+    .update({ status: "cancelada", motivo_cancelamento: "Removida pela Governança na ficha do Canal" })
+    .eq("id", areaId);
+
+  if (error) return { erro: error.message, momento: Date.now() };
+
+  revalidatePath(`/rede/${parceiroId}`);
+  revalidatePath("/territorios");
+  return { ok: true, momento: Date.now() };
+}
+
 // ── Oportunidade ─────────────────────────────────────────────────
 const esquemaOportunidade = z.object({
   id: texto,

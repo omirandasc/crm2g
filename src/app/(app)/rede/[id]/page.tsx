@@ -27,7 +27,13 @@ export default async function CanalDetalhePage({
 
   if (!parceiro) notFound();
 
-  const [{ data: socios }, { data: certidoes }] = await Promise.all([
+  const [
+    { data: socios },
+    { data: certidoes },
+    { data: autorizacoes },
+    { data: preferenciais },
+    { data: exclusivas },
+  ] = await Promise.all([
     supabase
       .from("socios")
       .select("id, nome, cpf, percentual, email, telefone")
@@ -40,6 +46,23 @@ export default async function CanalDetalhePage({
       .eq("entidade", "parceiro_rede")
       .eq("entidade_id", id)
       .order("created_at", { ascending: false }),
+    supabase
+      .from("autorizacoes_parceiro_produto")
+      .select("produto_id, produtos ( nome_produto )")
+      .eq("parceiro_rede_id", id)
+      .eq("status", "ativa"),
+    supabase
+      .from("areas_preferenciais")
+      .select("id, status, data_inicio, produtos ( nome_produto ), municipios ( nome, uf )")
+      .eq("parceiro_rede_id", id)
+      .in("status", ["solicitada", "em_analise", "aprovada", "ativa"])
+      .order("data_inicio", { ascending: false }),
+    supabase
+      .from("areas_exclusivas")
+      .select("id, data_inicio, produtos ( nome_produto ), municipios ( nome, uf )")
+      .eq("parceiro_rede_id", id)
+      .eq("status", "ativa")
+      .order("data_inicio", { ascending: false }),
   ]);
 
   return (
@@ -67,6 +90,16 @@ export default async function CanalDetalhePage({
         parceiro={parceiro as unknown as ParceiroLinha}
         socios={(socios ?? []) as SocioLinha[]}
         certidoes={(certidoes ?? []) as CertidaoLinha[]}
+        territorio={{
+          produtos: (autorizacoes ?? []).map((a) => ({
+            id: a.produto_id,
+            rotulo:
+              (a.produtos as unknown as { nome_produto: string } | null)?.nome_produto ??
+              "Produto",
+          })),
+          preferenciais: (preferenciais ?? []) as unknown as import("@/components/rede/territorio-canal").AreaLinha[],
+          exclusivas: (exclusivas ?? []) as unknown as import("@/components/rede/territorio-canal").ExclusivaLinha[],
+        }}
       />
     </div>
   );

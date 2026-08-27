@@ -121,3 +121,31 @@ create policy sel_palavras_pncp on public.palavras_chave_pncp
   for select to authenticated using (fn_e_doisge_leitura());
 create policy all_palavras_pncp_doisge on public.palavras_chave_pncp
   for all to authenticated using (fn_e_doisge()) with check (fn_e_doisge());
+
+-- ── DoisGe isenta do limite de cidades preferenciais (autonomia) ─
+create or replace function public.fn_validar_limite_area_preferencial()
+returns trigger language plpgsql as $$
+declare
+  v_limite integer;
+  v_atual integer;
+begin
+  if new.status in ('aprovada','ativa') and not fn_e_doisge() then
+    select coalesce(max(qtd_max_municipios_preferenciais), 20) into v_limite
+      from public.autorizacoes_parceiro_produto
+      where parceiro_rede_id = new.parceiro_rede_id
+        and produto_id = new.produto_id
+        and status = 'ativa';
+
+    select count(*) into v_atual
+      from public.areas_preferenciais
+      where parceiro_rede_id = new.parceiro_rede_id
+        and produto_id = new.produto_id
+        and status in ('aprovada','ativa')
+        and id <> new.id;
+
+    if v_atual >= v_limite then
+      raise exception 'Limite de % municípios na Área Preferencial atingido para este produto.', v_limite;
+    end if;
+  end if;
+  return new;
+end $$;
