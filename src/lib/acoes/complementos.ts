@@ -173,3 +173,42 @@ export async function salvarPolitica(
   revalidatePath("/politicas");
   return { ok: true, momento: Date.now() };
 }
+
+// ── Radar PNCP: palavras-chave monitoradas ───────────────────────
+const esquemaPalavraChave = z.object({
+  termo: obrigatorio("Digite a palavra-chave."),
+  uf: texto,
+});
+
+export async function salvarPalavraChave(
+  _prev: ResultadoAcao,
+  formData: FormData
+): Promise<ResultadoAcao> {
+  const dados = esquemaPalavraChave.safeParse(Object.fromEntries(formData));
+  if (!dados.success) {
+    return { erro: dados.error.issues[0].message, momento: Date.now() };
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const { error } = await supabase.from("palavras_chave_pncp").insert({
+    termo: dados.data.termo.toLowerCase(),
+    uf: dados.data.uf,
+    criado_por: user?.id ?? null,
+  });
+  if (error) return { erro: error.message, momento: Date.now() };
+
+  revalidatePath("/compras-publicas");
+  return { ok: true, momento: Date.now() };
+}
+
+export async function removerPalavraChave(id: string): Promise<ResultadoAcao> {
+  const supabase = await createClient();
+  const { error } = await supabase.from("palavras_chave_pncp").delete().eq("id", id);
+  if (error) return { erro: error.message, momento: Date.now() };
+  revalidatePath("/compras-publicas");
+  return { ok: true, momento: Date.now() };
+}

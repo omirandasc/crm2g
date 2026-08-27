@@ -106,3 +106,18 @@ update public.autorizacoes_parceiro_produto
 
 -- ── E-mail institucional da GovTech ──────────────────────────────
 alter table public.empresas_portfolio add column email_institucional text;
+
+-- ── Radar PNCP: palavras-chave monitoradas ───────────────────────
+create table public.palavras_chave_pncp (
+  id uuid primary key default gen_random_uuid(),
+  termo text not null,
+  uf char(2),
+  ativo boolean not null default true,
+  criado_por uuid references public.profiles (id),
+  created_at timestamptz not null default now()
+);
+alter table public.palavras_chave_pncp enable row level security;
+create policy sel_palavras_pncp on public.palavras_chave_pncp
+  for select to authenticated using (fn_e_doisge_leitura());
+create policy all_palavras_pncp_doisge on public.palavras_chave_pncp
+  for all to authenticated using (fn_e_doisge()) with check (fn_e_doisge());
