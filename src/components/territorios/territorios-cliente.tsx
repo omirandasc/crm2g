@@ -298,27 +298,36 @@ export function TerritoriosCliente({
 
                 <Separator />
 
-                <Button
-                  variant="destructive"
-                  className="w-full"
-                  disabled={decidindo || !motivoEncerramento.trim()}
-                  onClick={() => concluirEncerramento("encerrada")}
-                >
-                  Encerrar exclusividade — a cidade fica Livre
-                </Button>
-                <Button
-                  variant="outline"
-                  className="w-full"
-                  disabled={decidindo || !motivoEncerramento.trim()}
-                  onClick={() => concluirEncerramento("mantida_por_direito_economico")}
-                >
-                  Manter direito econômico — travada até o fim do contrato
-                </Button>
-                <p className="text-xs text-muted-foreground">
-                  No direito econômico, o Canal descredenciado continua recebendo
-                  as comissões deste cliente e a cidade permanece indisponível
-                  para outros Canais até o contrato com o ente público terminar.
-                </p>
+                <div className="space-y-1.5">
+                  <Button
+                    variant="destructive"
+                    className="w-full"
+                    disabled={decidindo || !motivoEncerramento.trim()}
+                    onClick={() => concluirEncerramento("encerrada")}
+                  >
+                    Encerrar exclusividade
+                  </Button>
+                  <p className="text-xs text-muted-foreground">
+                    A cidade volta a ficar <strong>Livre</strong> e qualquer Canal
+                    pode prospectá-la.
+                  </p>
+                </div>
+
+                <div className="space-y-1.5">
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    disabled={decidindo || !motivoEncerramento.trim()}
+                    onClick={() => concluirEncerramento("mantida_por_direito_economico")}
+                  >
+                    Manter direito econômico
+                  </Button>
+                  <p className="text-xs text-muted-foreground">
+                    A cidade segue <strong>travada até o fim do contrato</strong> com
+                    o ente público, e o Canal continua recebendo as comissões
+                    deste cliente.
+                  </p>
+                </div>
               </div>
             </>
           )}
