@@ -410,6 +410,31 @@ export const TIPOS_ORGAO: Record<string, string> = {
   outro: "Outro",
 };
 
+// Fases do negócio DoisGe ↔ GovTech (mapeadas no status da empresa).
+// A cor avança com a fase: cinza → amarelo → laranja → verde.
+export const FASES_GOVTECH: { valor: string; rotulo: string; cor: string }[] = [
+  { valor: "prospectada", rotulo: "Prospectando", cor: "bg-zinc-400" },
+  { valor: "em_negociacao", rotulo: "Negociando", cor: "bg-amber-500" },
+  { valor: "contrato_em_elaboracao", rotulo: "Contratando", cor: "bg-orange-500" },
+  { valor: "ativa", rotulo: "Contratado", cor: "bg-green-600" },
+];
+
+export const MODELOS_NEGOCIO_GOVTECH: Record<string, string> = {
+  fee: "Fee mensal",
+  comissao: "Comissão",
+  fee_comissao: "Fee + Comissão",
+  sociedade: "Sociedade",
+  projeto: "Projeto",
+};
+
+export const STATUS_PROPOSTA_TRABALHO: Record<string, string> = {
+  nao_iniciada: "Não iniciada",
+  em_elaboracao: "Em elaboração",
+  enviada: "Enviada",
+  aceita: "Aceita",
+  recusada: "Recusada",
+};
+
 export const PERFIS_DECISAO: Record<string, string> = {
   decisor: "Decisor",
   influenciador: "Influenciador",

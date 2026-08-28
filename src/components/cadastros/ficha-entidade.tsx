@@ -16,6 +16,11 @@ import {
   type AreaLinha,
   type ExclusivaLinha,
 } from "@/components/rede/territorio-canal";
+import {
+  NegocioGovTechAba,
+  type NegocioGovTech,
+  type ChecklistNegocio,
+} from "@/components/portfolio/negocio-govtech";
 import type { Opcao } from "@/components/autorizacoes/autorizacoes-cliente";
 import { salvarEmpresa, salvarParceiro } from "@/lib/acoes/cadastros";
 
@@ -27,6 +32,11 @@ export type TerritorioFicha = {
   exclusivas: ExclusivaLinha[];
 };
 
+export type NegocioFicha = {
+  negocio: NegocioGovTech;
+  checklist: ChecklistNegocio;
+};
+
 export function FichaEntidade({
   entidade,
   empresa,
@@ -34,6 +44,7 @@ export function FichaEntidade({
   socios,
   certidoes,
   territorio,
+  negocio,
 }: {
   entidade: "empresa_portfolio" | "parceiro_rede";
   empresa?: EmpresaLinha | null;
@@ -41,6 +52,7 @@ export function FichaEntidade({
   socios: SocioLinha[];
   certidoes: CertidaoLinha[];
   territorio?: TerritorioFicha | null;
+  negocio?: NegocioFicha | null;
 }) {
   const registroId = (empresa?.id ?? parceiro?.id)!;
 
@@ -56,6 +68,7 @@ export function FichaEntidade({
           Certidões
           {certidoes.length > 0 && <span className="ml-1 text-xs text-muted-foreground">{certidoes.length}</span>}
         </TabsTrigger>
+        {negocio && <TabsTrigger value="negocio">Negócio</TabsTrigger>}
         {territorio && (
           <TabsTrigger value="territorio">
             Território
@@ -97,6 +110,16 @@ export function FichaEntidade({
       <TabsContent value="certidoes" className="mt-4">
         <BlocoCertidoes entidade={entidade} entidadeId={registroId} certidoes={certidoes} />
       </TabsContent>
+
+      {negocio && (
+        <TabsContent value="negocio" className="mt-4">
+          <NegocioGovTechAba
+            empresaId={registroId}
+            negocio={negocio.negocio}
+            checklist={negocio.checklist}
+          />
+        </TabsContent>
+      )}
 
       {territorio && (
         <TabsContent value="territorio" className="mt-4">

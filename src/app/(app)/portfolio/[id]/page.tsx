@@ -7,7 +7,7 @@ import type { SocioLinha, CertidaoLinha } from "@/components/cadastros/socios-ce
 import { Pilula } from "@/components/selo-territorio";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
-import { STATUS_EMPRESA, TOM_STATUS_EMPRESA } from "@/lib/dominio";
+import { STATUS_EMPRESA, TOM_STATUS_EMPRESA, ehDoisge } from "@/lib/dominio";
 
 export const metadata = { title: "GovTech" };
 
@@ -27,19 +27,59 @@ export default async function GovTechDetalhePage({
 
   if (!empresa) notFound();
 
-  const [{ data: socios }, { data: certidoes }] = await Promise.all([
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const [{ data: perfil }, { data: socios }, { data: certidoes }, { data: produtos }] =
+    await Promise.all([
+      supabase.from("profiles").select("perfil").eq("id", user!.id).single(),
+      supabase
+        .from("socios")
+        .select("id, nome, cpf, percentual, email, telefone")
+        .eq("entidade", "empresa_portfolio")
+        .eq("entidade_id", id)
+        .order("percentual", { ascending: false }),
+      supabase
+        .from("certidoes")
+        .select("id, nome, data_validade, arquivo_url")
+        .eq("entidade", "empresa_portfolio")
+        .eq("entidade_id", id)
+        .order("created_at", { ascending: false }),
+      supabase.from("produtos").select("id").eq("empresa_portfolio_id", id),
+    ]);
+
+  // Checklist de implantação: o sistema confere sozinho o que já existe
+  const idsProdutos = (produtos ?? []).map((p) => p.id);
+  const [politicas, precos, playbook, termoRef] = await Promise.all([
     supabase
-      .from("socios")
-      .select("id, nome, cpf, percentual, email, telefone")
-      .eq("entidade", "empresa_portfolio")
-      .eq("entidade_id", id)
-      .order("percentual", { ascending: false }),
-    supabase
-      .from("certidoes")
-      .select("id, nome, data_validade, arquivo_url")
-      .eq("entidade", "empresa_portfolio")
-      .eq("entidade_id", id)
-      .order("created_at", { ascending: false }),
+      .from("politicas_comerciais")
+      .select("id", { count: "exact", head: true })
+      .eq("empresa_portfolio_id", id)
+      .then((r) => r.count ?? 0),
+    idsProdutos.length
+      ? supabase
+          .from("precos_produto")
+          .select("id", { count: "exact", head: true })
+          .in("produto_id", idsProdutos)
+          .then((r) => r.count ?? 0)
+      : Promise.resolve(0),
+    idsProdutos.length
+      ? supabase
+          .from("materiais_produto")
+          .select("id", { count: "exact", head: true })
+          .in("produto_id", idsProdutos)
+          .in("tipo_material", ["apresentacao_comercial", "manual"])
+          .then((r) => r.count ?? 0)
+      : Promise.resolve(0),
+    idsProdutos.length
+      ? supabase
+          .from("materiais_produto")
+          .select("id", { count: "exact", head: true })
+          .in("produto_id", idsProdutos)
+          .eq("tipo_material", "termo_referencia")
+          .then((r) => r.count ?? 0)
+      : Promise.resolve(0),
   ]);
 
   return (
@@ -67,6 +107,22 @@ export default async function GovTechDetalhePage({
         empresa={empresa as unknown as EmpresaLinha}
         socios={(socios ?? []) as SocioLinha[]}
         certidoes={(certidoes ?? []) as CertidaoLinha[]}
+        negocio={
+          ehDoisge(perfil?.perfil)
+            ? {
+                negocio: {
+                  status: empresa.status,
+                  modelo_negocio: empresa.modelo_negocio ?? null,
+                  modulos: empresa.modulos ?? null,
+                  proposta_trabalho: empresa.proposta_trabalho ?? null,
+                  condicoes_financeiras: empresa.condicoes_financeiras ?? null,
+                  modelo_distribuicao: empresa.modelo_distribuicao ?? null,
+                  remuneracao_canal: empresa.remuneracao_canal ?? null,
+                },
+                checklist: { politicas, precos, playbook, termoReferencia: termoRef },
+              }
+            : null
+        }
       />
     </div>
   );

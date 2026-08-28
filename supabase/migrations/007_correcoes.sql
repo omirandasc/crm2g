@@ -245,3 +245,13 @@ begin
   end if;
   return new;
 end $$;
+
+-- ── Aba "Negócio" da GovTech (acordo DoisGe ↔ GovTech) ───────────
+-- (importação da planilha Funil do Portfólio feita em produção em 28/08/2026)
+alter table public.empresas_portfolio
+  add column if not exists modelo_negocio text,
+  add column if not exists modulos text[],
+  add column if not exists proposta_trabalho text,
+  add column if not exists condicoes_financeiras text,
+  add column if not exists modelo_distribuicao text,
+  add column if not exists remuneracao_canal text;

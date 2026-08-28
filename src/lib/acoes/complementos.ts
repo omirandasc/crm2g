@@ -212,3 +212,58 @@ export async function removerPalavraChave(id: string): Promise<ResultadoAcao> {
   revalidatePath("/compras-publicas");
   return { ok: true, momento: Date.now() };
 }
+
+// ── Negócio DoisGe ↔ GovTech (fase + condições do acordo) ────────
+const esquemaNegocio = z.object({
+  empresa_id: obrigatorio("Empresa inválida."),
+  modelo_negocio: texto,
+  modulos: z.preprocess(
+    (v) =>
+      String(v ?? "")
+        .split(",")
+        .map((s) => s.trim().toUpperCase())
+        .filter((s) => /^M\d$/.test(s)),
+    z.array(z.string())
+  ),
+  proposta_trabalho: texto,
+  condicoes_financeiras: texto,
+  modelo_distribuicao: texto,
+  remuneracao_canal: texto,
+});
+
+export async function salvarNegocioGovTech(
+  _prev: ResultadoAcao,
+  formData: FormData
+): Promise<ResultadoAcao> {
+  const dados = esquemaNegocio.safeParse(Object.fromEntries(formData));
+  if (!dados.success) {
+    return { erro: dados.error.issues[0].message, momento: Date.now() };
+  }
+
+  const { empresa_id, ...campos } = dados.data;
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("empresas_portfolio")
+    .update(campos)
+    .eq("id", empresa_id);
+  if (error) return { erro: error.message, momento: Date.now() };
+
+  revalidatePath(`/portfolio/${empresa_id}`);
+  return { ok: true, momento: Date.now() };
+}
+
+export async function atualizarFaseGovTech(
+  empresaId: string,
+  fase: string
+): Promise<ResultadoAcao> {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("empresas_portfolio")
+    .update({ status: fase })
+    .eq("id", empresaId);
+  if (error) return { erro: error.message, momento: Date.now() };
+
+  revalidatePath(`/portfolio/${empresaId}`);
+  revalidatePath("/portfolio");
+  return { ok: true, momento: Date.now() };
+}
