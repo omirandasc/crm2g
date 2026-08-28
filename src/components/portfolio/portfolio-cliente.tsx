@@ -2,7 +2,14 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { Plus, Search, Building2, Pencil } from "lucide-react";
+import { Plus, Search, Building2, Pencil, ArrowUp, ArrowDown, ChevronsUpDown, X } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -95,12 +102,95 @@ export function FormEmpresa({ empresa }: { empresa?: EmpresaLinha | null }) {
   );
 }
 
+type ColunaOrdenavel = "empresa" | "cnpj" | "cidade" | "segmento" | "status";
+
+// Ordem do funil: da prospecção ao contrato, com suspensas/encerradas no fim
+const ORDEM_STATUS = [
+  "prospectada",
+  "em_negociacao",
+  "contrato_em_elaboracao",
+  "ativa",
+  "suspensa",
+  "encerrada",
+];
+
+// Vazios sempre por último, independente da direção
+function compararTexto(a: string | null | undefined, b: string | null | undefined) {
+  if (!a && !b) return 0;
+  if (!a) return 1;
+  if (!b) return -1;
+  return a.localeCompare(b, "pt-BR", { sensitivity: "base" });
+}
+
+function compararPorColuna(a: EmpresaLinha, b: EmpresaLinha, coluna: ColunaOrdenavel) {
+  switch (coluna) {
+    case "empresa":
+      return compararTexto(a.nome_fantasia || a.razao_social, b.nome_fantasia || b.razao_social);
+    case "cnpj": {
+      const na = (a.cnpj ?? "").replace(/\D/g, "");
+      const nb = (b.cnpj ?? "").replace(/\D/g, "");
+      if (!na && !nb) return 0;
+      if (!na) return 1;
+      if (!nb) return -1;
+      return na.localeCompare(nb, undefined, { numeric: true });
+    }
+    case "cidade":
+      // ordem estadual: UF primeiro, cidade como desempate
+      return compararTexto(a.uf, b.uf) || compararTexto(a.cidade, b.cidade);
+    case "segmento":
+      return compararTexto(a.segmento, b.segmento);
+    case "status": {
+      const ia = ORDEM_STATUS.indexOf(a.status);
+      const ib = ORDEM_STATUS.indexOf(b.status);
+      return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib);
+    }
+  }
+}
+
 export function PortfolioCliente({ empresas }: { empresas: EmpresaLinha[] }) {
   const [busca, setBusca] = React.useState("");
+  const [filtroStatus, setFiltroStatus] = React.useState("todos");
+  const [ordem, setOrdem] = React.useState<{ coluna: ColunaOrdenavel; desc: boolean } | null>(null);
   const [novaAberta, setNovaAberta] = React.useState(false);
   const router = useRouter();
 
+  const ordenarPor = (coluna: ColunaOrdenavel) =>
+    setOrdem((atual) =>
+      atual?.coluna === coluna ? { coluna, desc: !atual.desc } : { coluna, desc: false }
+    );
+
+  const CabecalhoOrdenavel = ({
+    coluna,
+    rotulo,
+    className,
+  }: {
+    coluna: ColunaOrdenavel;
+    rotulo: string;
+    className?: string;
+  }) => (
+    <TableHead className={className}>
+      <button
+        type="button"
+        onClick={() => ordenarPor(coluna)}
+        className="inline-flex items-center gap-1 hover:text-foreground"
+        title={`Ordenar por ${rotulo.toLowerCase()}`}
+      >
+        {rotulo}
+        {ordem?.coluna === coluna ? (
+          ordem.desc ? (
+            <ArrowDown className="size-3.5 text-marca-600" />
+          ) : (
+            <ArrowUp className="size-3.5 text-marca-600" />
+          )
+        ) : (
+          <ChevronsUpDown className="size-3 opacity-40" />
+        )}
+      </button>
+    </TableHead>
+  );
+
   const filtradas = empresas.filter((e) => {
+    if (filtroStatus !== "todos" && e.status !== filtroStatus) return false;
     const termo = busca.toLowerCase();
     return (
       e.razao_social.toLowerCase().includes(termo) ||
@@ -108,6 +198,12 @@ export function PortfolioCliente({ empresas }: { empresas: EmpresaLinha[] }) {
       (e.cnpj ?? "").includes(termo)
     );
   });
+
+  const exibidas = ordem
+    ? [...filtradas].sort(
+        (a, b) => compararPorColuna(a, b, ordem.coluna) * (ordem.desc ? -1 : 1)
+      )
+    : filtradas;
 
   return (
     <div className="space-y-5">
@@ -122,6 +218,29 @@ export function PortfolioCliente({ empresas }: { empresas: EmpresaLinha[] }) {
             className="pl-8"
           />
         </div>
+        <Select
+          value={filtroStatus}
+          onValueChange={(v) => setFiltroStatus((v as string) ?? "todos")}
+          items={{ todos: "Todos os status", ...STATUS_EMPRESA }}
+        >
+          <SelectTrigger className="w-44">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="todos">Todos os status</SelectItem>
+            {Object.entries(STATUS_EMPRESA).map(([valor, rotulo]) => (
+              <SelectItem key={valor} value={valor}>
+                {rotulo}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {filtroStatus !== "todos" && (
+          <Button variant="ghost" size="sm" onClick={() => setFiltroStatus("todos")}>
+            <X className="size-3.5" />
+            Limpar filtro
+          </Button>
+        )}
         <Button onClick={() => setNovaAberta(true)}>
           <Plus className="size-4" />
           Nova empresa
@@ -145,16 +264,16 @@ export function PortfolioCliente({ empresas }: { empresas: EmpresaLinha[] }) {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Empresa</TableHead>
-                <TableHead className="hidden md:table-cell">CNPJ</TableHead>
-                <TableHead className="hidden sm:table-cell">Cidade/UF</TableHead>
-                <TableHead className="hidden lg:table-cell">Segmento</TableHead>
-                <TableHead>Status</TableHead>
+                <CabecalhoOrdenavel coluna="empresa" rotulo="Empresa" />
+                <CabecalhoOrdenavel coluna="cnpj" rotulo="CNPJ" className="hidden md:table-cell" />
+                <CabecalhoOrdenavel coluna="cidade" rotulo="Cidade/UF" className="hidden sm:table-cell" />
+                <CabecalhoOrdenavel coluna="segmento" rotulo="Segmento" className="hidden lg:table-cell" />
+                <CabecalhoOrdenavel coluna="status" rotulo="Status" />
                 <TableHead className="w-10" />
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filtradas.map((e) => (
+              {exibidas.map((e) => (
                 <TableRow
                   key={e.id}
                   className="cursor-pointer"
@@ -181,10 +300,10 @@ export function PortfolioCliente({ empresas }: { empresas: EmpresaLinha[] }) {
                   </TableCell>
                 </TableRow>
               ))}
-              {filtradas.length === 0 && (
+              {exibidas.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
-                    Nenhuma empresa encontrada com essa busca.
+                    Nenhuma empresa encontrada com essa busca ou filtro.
                   </TableCell>
                 </TableRow>
               )}
