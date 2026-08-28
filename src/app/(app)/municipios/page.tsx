@@ -37,6 +37,51 @@ export default async function MunicipiosPage({
   const total = count ?? 0;
   const totalPaginas = Math.max(1, Math.ceil(total / POR_PAGINA));
 
+  // Situação territorial real dos municípios da página
+  const ids = (municipios ?? []).map((m) => m.id);
+  const [{ data: preferenciais }, { data: exclusivas }] = await Promise.all([
+    ids.length
+      ? supabase
+          .from("areas_preferenciais")
+          .select(
+            "municipio_id, produtos ( nome_produto ), parceiros_rede ( razao_social, nome_fantasia )"
+          )
+          .in("municipio_id", ids)
+          .in("status", ["aprovada", "ativa"])
+      : Promise.resolve({ data: [] as never[] }),
+    ids.length
+      ? supabase
+          .from("areas_exclusivas")
+          .select(
+            "municipio_id, produtos ( nome_produto ), parceiros_rede ( razao_social, nome_fantasia )"
+          )
+          .in("municipio_id", ids)
+          .in("status", ["ativa", "em_implantacao", "em_renovacao", "mantida_por_direito_economico"])
+      : Promise.resolve({ data: [] as never[] }),
+  ]);
+
+  type AreaBruta = {
+    municipio_id: string;
+    produtos: { nome_produto: string } | null;
+    parceiros_rede: { razao_social: string; nome_fantasia: string | null } | null;
+  };
+
+  const territorios: Record<
+    string,
+    { status: "livre" | "preferencial" | "exclusiva"; itens: { tipo: string; produto: string; canal: string }[] }
+  > = {};
+  const registrar = (a: AreaBruta, tipo: "preferencial" | "exclusiva") => {
+    const alvo = (territorios[a.municipio_id] ??= { status: "livre", itens: [] });
+    alvo.itens.push({
+      tipo,
+      produto: a.produtos?.nome_produto ?? "Produto",
+      canal: a.parceiros_rede?.nome_fantasia || a.parceiros_rede?.razao_social || "Canal",
+    });
+    if (tipo === "exclusiva" || alvo.status === "livre") alvo.status = tipo;
+  };
+  ((preferenciais ?? []) as unknown as AreaBruta[]).forEach((a) => registrar(a, "preferencial"));
+  ((exclusivas ?? []) as unknown as AreaBruta[]).forEach((a) => registrar(a, "exclusiva"));
+
   const linkPagina = (nova: number) => {
     const p = new URLSearchParams();
     if (q) p.set("q", q);
@@ -59,7 +104,10 @@ export default async function MunicipiosPage({
         <FiltrosMunicipios />
       </Suspense>
 
-      <TabelaMunicipios linhas={(municipios ?? []) as MunicipioLinha[]} />
+      <TabelaMunicipios
+        linhas={(municipios ?? []) as MunicipioLinha[]}
+        territorios={territorios}
+      />
 
       {totalPaginas > 1 && (
         <div className="flex items-center justify-between text-sm">

@@ -34,8 +34,21 @@ export type MunicipioLinha = {
   microrregiao: string | null;
 };
 
-export function TabelaMunicipios({ linhas }: { linhas: MunicipioLinha[] }) {
+export type TerritorioMunicipio = {
+  status: "livre" | "preferencial" | "exclusiva";
+  itens: { tipo: string; produto: string; canal: string }[];
+};
+
+export function TabelaMunicipios({
+  linhas,
+  territorios,
+}: {
+  linhas: MunicipioLinha[];
+  territorios: Record<string, TerritorioMunicipio>;
+}) {
   const [selecionado, setSelecionado] = React.useState<MunicipioLinha | null>(null);
+  const territorioDe = (id: string): TerritorioMunicipio =>
+    territorios[id] ?? { status: "livre", itens: [] };
 
   return (
     <>
@@ -72,7 +85,7 @@ export function TabelaMunicipios({ linhas }: { linhas: MunicipioLinha[] }) {
                   </Badge>
                 </TableCell>
                 <TableCell className="hidden lg:table-cell">
-                  <SeloTerritorio status="livre" />
+                  <SeloTerritorio status={territorioDe(m.id).status} />
                 </TableCell>
               </TableRow>
             ))}
@@ -103,11 +116,24 @@ export function TabelaMunicipios({ linhas }: { linhas: MunicipioLinha[] }) {
               </SheetHeader>
 
               <div className="space-y-5 px-4 pb-6">
-                <div className="flex items-center gap-2">
-                  <SeloTerritorio status="livre" />
-                  <span className="text-xs text-muted-foreground">
-                    Nenhuma área preferencial ou exclusiva ativa neste município.
-                  </span>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <SeloTerritorio status={territorioDe(selecionado.id).status} />
+                    {territorioDe(selecionado.id).itens.length === 0 && (
+                      <span className="text-xs text-muted-foreground">
+                        Nenhuma área preferencial ou exclusiva ativa neste município.
+                      </span>
+                    )}
+                  </div>
+                  {territorioDe(selecionado.id).itens.map((item, i) => (
+                    <p key={i} className="text-sm">
+                      <span className="font-medium">
+                        {item.tipo === "exclusiva" ? "Exclusiva" : "Preferencial"}
+                      </span>{" "}
+                      · {item.produto} ·{" "}
+                      <span className="text-muted-foreground">{item.canal}</span>
+                    </p>
+                  ))}
                 </div>
 
                 <Separator />
