@@ -12,26 +12,39 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { UFS } from "@/lib/dominio";
+import { UFS, PORTES_MUNICIPIO } from "@/lib/dominio";
+
+const SITUACOES: Record<string, string> = {
+  livre: "Livre",
+  preferencial: "Preferencial",
+  exclusiva: "Exclusiva",
+};
 
 export function FiltrosMunicipios() {
   const router = useRouter();
   const params = useSearchParams();
   const [busca, setBusca] = React.useState(params.get("q") ?? "");
-  const [uf, setUf] = React.useState(params.get("uf") ?? "todas");
   const [filtrando, startFiltro] = React.useTransition();
 
-  const montarUrl = (novaBusca: string, novaUf: string) => {
-    const p = new URLSearchParams();
-    if (novaBusca) p.set("q", novaBusca);
-    if (novaUf && novaUf !== "todas") p.set("uf", novaUf);
-    return `/municipios?${p.toString()}`;
+  const uf = params.get("uf") ?? "todas";
+  const porte = params.get("porte") ?? "todos";
+  const territorio = params.get("territorio") ?? "todas";
+
+  const montarUrl = (mudancas: Record<string, string>) => {
+    const p = new URLSearchParams(params.toString());
+    for (const [chave, valor] of Object.entries(mudancas)) {
+      const vazio =
+        valor === "" || valor === "todas" || valor === "todos";
+      if (vazio) p.delete(chave);
+      else p.set(chave, valor);
+    }
+    p.delete("pagina"); // filtro novo volta para a página 1
+    const query = p.toString();
+    return query ? `/municipios?${query}` : "/municipios";
   };
 
-  // Enter / troca de UF: fixa o filtro (entra no histórico, dá para copiar o link)
-  const aplicar = (novaBusca: string, novaUf: string) => {
-    startFiltro(() => router.push(montarUrl(novaBusca, novaUf)));
-  };
+  const aplicar = (mudancas: Record<string, string>) =>
+    startFiltro(() => router.push(montarUrl(mudancas)));
 
   // Digitação: filtra ao vivo com debounce, sem poluir o histórico
   const primeiraRenderizacao = React.useRef(true);
@@ -41,20 +54,21 @@ export function FiltrosMunicipios() {
       return;
     }
     const t = setTimeout(() => {
-      startFiltro(() => router.replace(montarUrl(busca, uf), { scroll: false }));
+      startFiltro(() => router.replace(montarUrl({ q: busca }), { scroll: false }));
     }, 400);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [busca]);
 
-  const temFiltro = busca !== "" || uf !== "todas";
+  const temFiltro =
+    busca !== "" || uf !== "todas" || porte !== "todos" || territorio !== "todas";
 
   return (
     <form
       className="flex flex-wrap items-center gap-2"
       onSubmit={(e) => {
         e.preventDefault();
-        aplicar(busca, uf);
+        aplicar({ q: busca });
       }}
     >
       <div className="relative flex-1 min-w-52">
@@ -72,12 +86,45 @@ export function FiltrosMunicipios() {
       </div>
 
       <Select
+        value={territorio}
+        onValueChange={(v) => aplicar({ territorio: (v as string) ?? "todas" })}
+        items={{ todas: "Todas as situações", ...SITUACOES }}
+      >
+        <SelectTrigger className="w-44">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="todas">Todas as situações</SelectItem>
+          {Object.entries(SITUACOES).map(([valor, rotulo]) => (
+            <SelectItem key={valor} value={valor}>
+              {rotulo}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+
+      <Select
+        value={porte}
+        onValueChange={(v) => aplicar({ porte: (v as string) ?? "todos" })}
+        items={{ todos: "Todos os portes", ...PORTES_MUNICIPIO }}
+      >
+        <SelectTrigger className="w-44">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="todos">Todos os portes</SelectItem>
+          {Object.entries(PORTES_MUNICIPIO).map(([valor, rotulo]) => (
+            <SelectItem key={valor} value={valor}>
+              {rotulo}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+
+      <Select
         value={uf}
-        onValueChange={(v) => {
-          const nova = (v as string) ?? "todas";
-          setUf(nova);
-          aplicar(busca, nova);
-        }}
+        onValueChange={(v) => aplicar({ uf: (v as string) ?? "todas" })}
+        items={{ todas: "Todas as UFs", ...Object.fromEntries(UFS.map((s) => [s, s])) }}
       >
         <SelectTrigger className="w-32">
           <SelectValue />
@@ -99,12 +146,11 @@ export function FiltrosMunicipios() {
           size="sm"
           onClick={() => {
             setBusca("");
-            setUf("todas");
-            router.push("/municipios");
+            startFiltro(() => router.push("/municipios"));
           }}
         >
           <X className="size-3.5" />
-          Limpar
+          Limpar filtros
         </Button>
       )}
     </form>

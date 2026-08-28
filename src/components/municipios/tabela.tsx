@@ -1,7 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { MapPin, Users, Landmark, Globe } from "lucide-react";
+import Link from "next/link";
+import { MapPin, Users, Landmark, Globe, ArrowUp, ArrowDown, ChevronsUpDown } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -39,16 +40,64 @@ export type TerritorioMunicipio = {
   itens: { tipo: string; produto: string; canal: string }[];
 };
 
+export type OrdenacaoMunicipios = {
+  coluna: string;
+  desc: boolean;
+  parametros: Record<string, string>;
+};
+
 export function TabelaMunicipios({
   linhas,
   territorios,
+  ordenacao,
 }: {
   linhas: MunicipioLinha[];
   territorios: Record<string, TerritorioMunicipio>;
+  ordenacao: OrdenacaoMunicipios;
 }) {
   const [selecionado, setSelecionado] = React.useState<MunicipioLinha | null>(null);
   const territorioDe = (id: string): TerritorioMunicipio =>
     territorios[id] ?? { status: "livre", itens: [] };
+
+  // Ordenação no servidor: o cabeçalho é um link que troca ordenar/dir na URL
+  const CabecalhoOrdenavel = ({
+    coluna,
+    rotulo,
+    className,
+  }: {
+    coluna: string;
+    rotulo: string;
+    className?: string;
+  }) => {
+    const ativa = ordenacao.coluna === coluna;
+    const p = new URLSearchParams(ordenacao.parametros);
+    if (coluna === "nome") p.delete("ordenar");
+    else p.set("ordenar", coluna);
+    if (ativa && !ordenacao.desc) p.set("dir", "desc");
+    else p.delete("dir");
+    p.delete("pagina");
+    const query = p.toString();
+    return (
+      <TableHead className={className}>
+        <Link
+          href={query ? `/municipios?${query}` : "/municipios"}
+          className="inline-flex items-center gap-1 hover:text-foreground"
+          title={`Ordenar por ${rotulo.toLowerCase()}`}
+        >
+          {rotulo}
+          {ativa ? (
+            ordenacao.desc ? (
+              <ArrowDown className="size-3.5 text-marca-600" />
+            ) : (
+              <ArrowUp className="size-3.5 text-marca-600" />
+            )
+          ) : (
+            <ChevronsUpDown className="size-3 opacity-40" />
+          )}
+        </Link>
+      </TableHead>
+    );
+  };
 
   return (
     <>
@@ -56,10 +105,10 @@ export function TabelaMunicipios({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Município</TableHead>
-              <TableHead className="w-16">UF</TableHead>
-              <TableHead className="hidden md:table-cell">Região</TableHead>
-              <TableHead className="text-right">População</TableHead>
+              <CabecalhoOrdenavel coluna="nome" rotulo="Município" />
+              <CabecalhoOrdenavel coluna="uf" rotulo="UF" className="w-16" />
+              <CabecalhoOrdenavel coluna="regiao" rotulo="Região" className="hidden md:table-cell" />
+              <CabecalhoOrdenavel coluna="populacao" rotulo="População" className="text-right" />
               <TableHead className="hidden sm:table-cell">Porte</TableHead>
               <TableHead className="hidden lg:table-cell">Território</TableHead>
             </TableRow>

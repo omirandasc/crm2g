@@ -11,24 +11,70 @@ export const metadata = { title: "Municípios" };
 
 const POR_PAGINA = 25;
 
+const UUID_NULO = "00000000-0000-0000-0000-000000000000";
+
+// Colunas ordenáveis no servidor (Território é só filtro, por ser calculado)
+const ORDENACOES: Record<string, { coluna: string; segunda?: string }> = {
+  nome: { coluna: "nome" },
+  uf: { coluna: "uf", segunda: "nome" },
+  regiao: { coluna: "regiao", segunda: "nome" },
+  populacao: { coluna: "populacao" },
+};
+
 export default async function MunicipiosPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; uf?: string; pagina?: string }>;
+  searchParams: Promise<{
+    q?: string;
+    uf?: string;
+    porte?: string;
+    territorio?: string;
+    ordenar?: string;
+    dir?: string;
+    pagina?: string;
+  }>;
 }) {
-  const { q = "", uf = "", pagina = "1" } = await searchParams;
+  const {
+    q = "",
+    uf = "",
+    porte = "",
+    territorio = "",
+    ordenar = "nome",
+    dir = "asc",
+    pagina = "1",
+  } = await searchParams;
   const paginaAtual = Math.max(1, parseInt(pagina, 10) || 1);
   const de = (paginaAtual - 1) * POR_PAGINA;
 
   const supabase = await createClient();
+
+  // Situação territorial: conjuntos de municípios ocupados (listas pequenas)
+  const [{ data: prefTodos }, { data: exclTodos }] = await Promise.all([
+    supabase
+      .from("areas_preferenciais")
+      .select("municipio_id")
+      .in("status", ["aprovada", "ativa"]),
+    supabase
+      .from("areas_exclusivas")
+      .select("municipio_id")
+      .in("status", ["ativa", "em_implantacao", "em_renovacao", "mantida_por_direito_economico"]),
+  ]);
+  const idsExclusivos = new Set((exclTodos ?? []).map((a) => a.municipio_id));
+  const idsPreferenciais = new Set(
+    (prefTodos ?? []).map((a) => a.municipio_id).filter((id) => !idsExclusivos.has(id))
+  );
+
+  const ordenacao = ORDENACOES[ordenar] ?? ORDENACOES.nome;
+  const ascendente = dir !== "desc";
 
   let consulta = supabase
     .from("municipios")
     .select("id, codigo_ibge, nome, uf, populacao, porte, regiao, microrregiao", {
       count: "exact",
     })
-    .order("nome")
-    .range(de, de + POR_PAGINA - 1);
+    .order(ordenacao.coluna, { ascending: ascendente, nullsFirst: false });
+  if (ordenacao.segunda) consulta = consulta.order(ordenacao.segunda, { ascending: true });
+  consulta = consulta.range(de, de + POR_PAGINA - 1);
 
   // Busca ignorando acentos: normaliza o termo e consulta a coluna nome_busca
   const termoNormalizado = q
@@ -37,6 +83,18 @@ export default async function MunicipiosPage({
     .toLowerCase();
   if (q) consulta = consulta.ilike("nome_busca", `%${termoNormalizado}%`);
   if (uf) consulta = consulta.eq("uf", uf);
+  if (porte) consulta = consulta.eq("porte", porte);
+
+  if (territorio === "exclusiva") {
+    consulta = consulta.in("id", idsExclusivos.size ? [...idsExclusivos] : [UUID_NULO]);
+  } else if (territorio === "preferencial") {
+    consulta = consulta.in("id", idsPreferenciais.size ? [...idsPreferenciais] : [UUID_NULO]);
+  } else if (territorio === "livre") {
+    const ocupados = [...idsExclusivos, ...idsPreferenciais];
+    if (ocupados.length) {
+      consulta = consulta.not("id", "in", `(${ocupados.join(",")})`);
+    }
+  }
 
   const { data: municipios, count } = await consulta;
   const total = count ?? 0;
@@ -87,10 +145,16 @@ export default async function MunicipiosPage({
   ((preferenciais ?? []) as unknown as AreaBruta[]).forEach((a) => registrar(a, "preferencial"));
   ((exclusivas ?? []) as unknown as AreaBruta[]).forEach((a) => registrar(a, "exclusiva"));
 
+  const parametrosAtuais: Record<string, string> = {};
+  if (q) parametrosAtuais.q = q;
+  if (uf) parametrosAtuais.uf = uf;
+  if (porte) parametrosAtuais.porte = porte;
+  if (territorio) parametrosAtuais.territorio = territorio;
+  if (ordenar !== "nome") parametrosAtuais.ordenar = ordenar;
+  if (dir !== "asc") parametrosAtuais.dir = dir;
+
   const linkPagina = (nova: number) => {
-    const p = new URLSearchParams();
-    if (q) p.set("q", q);
-    if (uf) p.set("uf", uf);
+    const p = new URLSearchParams(parametrosAtuais);
     p.set("pagina", String(nova));
     return `/municipios?${p.toString()}`;
   };
@@ -112,6 +176,7 @@ export default async function MunicipiosPage({
       <TabelaMunicipios
         linhas={(municipios ?? []) as MunicipioLinha[]}
         territorios={territorios}
+        ordenacao={{ coluna: ordenar, desc: !ascendente, parametros: parametrosAtuais }}
       />
 
       {totalPaginas > 1 && (
