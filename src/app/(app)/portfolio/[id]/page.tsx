@@ -8,6 +8,7 @@ import { Pilula } from "@/components/selo-territorio";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { STATUS_EMPRESA, TOM_STATUS_EMPRESA, ehDoisge } from "@/lib/dominio";
+import { ExcluirGovTech } from "@/components/portfolio/excluir-govtech";
 
 export const metadata = { title: "GovTech" };
 
@@ -100,6 +101,12 @@ export default async function GovTechDetalhePage({
         <Pilula tom={TOM_STATUS_EMPRESA[empresa.status] ?? "neutro"}>
           {STATUS_EMPRESA[empresa.status] ?? empresa.status}
         </Pilula>
+        {ehDoisge(perfil?.perfil) && (
+          <ExcluirGovTech
+            empresaId={empresa.id}
+            nome={empresa.nome_fantasia || empresa.razao_social}
+          />
+        )}
       </div>
 
       <FichaEntidade

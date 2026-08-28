@@ -179,3 +179,48 @@ export async function salvarParceiro(
   revalidatePath("/painel");
   return { ok: true, momento: Date.now() };
 }
+
+// ── Excluir GovTech (só DoisGe; bloqueada quando há vínculos) ────
+export async function excluirEmpresa(empresaId: string): Promise<ResultadoAcao> {
+  const supabase = await createClient();
+
+  const { count: produtos } = await supabase
+    .from("produtos")
+    .select("id", { count: "exact", head: true })
+    .eq("empresa_portfolio_id", empresaId);
+
+  if ((produtos ?? 0) > 0) {
+    return {
+      erro: `Esta GovTech tem ${produtos} produto(s) cadastrado(s). Exclua os produtos primeiro ou marque a empresa como Encerrada para preservar o histórico.`,
+      momento: Date.now(),
+    };
+  }
+
+  const { data: excluidas, error } = await supabase
+    .from("empresas_portfolio")
+    .delete()
+    .eq("id", empresaId)
+    .select("id");
+
+  if (error) {
+    if (error.code === "23503") {
+      return {
+        erro: "Esta GovTech tem vínculos no sistema (políticas, usuários, contratos ou oportunidades). Marque a empresa como Encerrada para preservar o histórico.",
+        momento: Date.now(),
+      };
+    }
+    return { erro: error.message, momento: Date.now() };
+  }
+
+  if (!excluidas || excluidas.length === 0) {
+    return { erro: "Apenas a DoisGe (Governança) pode excluir uma GovTech.", momento: Date.now() };
+  }
+
+  // Registros polimórficos (sem FK) só são limpos após a exclusão dar certo
+  await supabase.from("socios").delete().eq("entidade", "empresa_portfolio").eq("entidade_id", empresaId);
+  await supabase.from("certidoes").delete().eq("entidade", "empresa_portfolio").eq("entidade_id", empresaId);
+
+  revalidatePath("/portfolio");
+  revalidatePath("/painel");
+  return { ok: true, momento: Date.now() };
+}
