@@ -197,6 +197,43 @@ export async function escolherCidadePreferencial(
   return { ok: true, momento: Date.now() };
 }
 
+// A Governança encerra uma exclusividade manualmente (motivo obrigatório)
+export async function encerrarExclusividade(
+  areaId: string,
+  decisao: "encerrada" | "mantida_por_direito_economico",
+  motivo: string
+): Promise<ResultadoAcao> {
+  if (!motivo || !motivo.trim()) {
+    return { erro: "Informe o motivo do encerramento.", momento: Date.now() };
+  }
+
+  const supabase = await createClient();
+  const campos: Record<string, unknown> = {
+    status: decisao,
+    motivo_encerramento: motivo.trim(),
+  };
+  if (decisao === "encerrada") campos.data_fim = new Date().toISOString().slice(0, 10);
+  if (decisao === "mantida_por_direito_economico") campos.direito_economico_mantido = true;
+
+  const { data: alteradas, error } = await supabase
+    .from("areas_exclusivas")
+    .update(campos)
+    .eq("id", areaId)
+    .select("id");
+
+  if (error) return { erro: error.message, momento: Date.now() };
+  if (!alteradas || alteradas.length === 0) {
+    return {
+      erro: "Apenas a DoisGe (Governança) pode encerrar uma exclusividade.",
+      momento: Date.now(),
+    };
+  }
+
+  revalidatePath("/territorios");
+  revalidatePath("/municipios");
+  return { ok: true, momento: Date.now() };
+}
+
 // A Governança define uma cidade preferencial diretamente (já nasce ativa)
 export async function definirAreaPreferencial(
   _prev: ResultadoAcao,

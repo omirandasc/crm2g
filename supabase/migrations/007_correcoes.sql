@@ -264,3 +264,24 @@ $$ select lower(public.unaccent(texto)) $$;
 alter table public.municipios
   add column nome_busca text generated always as (public.fn_sem_acento(nome)) stored;
 create index idx_municipios_nome_busca on public.municipios (nome_busca text_pattern_ops);
+
+-- ── Contrato encerrado/cancelado → exclusividade encerra junto ───
+create or replace function public.fn_encerrar_exclusiva_com_contrato()
+returns trigger language plpgsql as $$
+begin
+  if new.status_contrato in ('encerrado','cancelado')
+     and old.status_contrato is distinct from new.status_contrato then
+    update public.areas_exclusivas
+      set status = 'encerrada',
+          data_fim = current_date,
+          motivo_encerramento = 'Contrato ' || coalesce(new.numero_contrato, 'sem número') ||
+            case when new.status_contrato = 'cancelado' then ' cancelado' else ' encerrado' end
+      where contrato_id = new.id
+        and status in ('ativa','em_implantacao','em_renovacao','suspensa','mantida_por_direito_economico');
+  end if;
+  return new;
+end $$;
+
+create trigger trg_encerrar_exclusiva_contrato
+  after update of status_contrato on public.contratos
+  for each row execute function public.fn_encerrar_exclusiva_com_contrato();

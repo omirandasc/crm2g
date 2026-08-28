@@ -29,9 +29,12 @@ import {
   STATUS_AREA_PREFERENCIAL,
   TOM_STATUS_AREA,
 } from "@/lib/dominio";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import {
   solicitarAreaPreferencial,
   decidirAreaPreferencial,
+  encerrarExclusividade,
 } from "@/lib/acoes/comercial";
 import { formatarData } from "@/lib/utils";
 import type { Opcao } from "@/components/autorizacoes/autorizacoes-cliente";
@@ -74,7 +77,27 @@ export function TerritoriosCliente({
 }) {
   const [novaAberta, setNovaAberta] = React.useState(false);
   const [detalhe, setDetalhe] = React.useState<AreaPreferencialLinha | null>(null);
+  const [encerrando, setEncerrando] = React.useState<AreaExclusivaLinha | null>(null);
+  const [motivoEncerramento, setMotivoEncerramento] = React.useState("");
   const [decidindo, startDecisao] = React.useTransition();
+
+  const concluirEncerramento = (decisao: "encerrada" | "mantida_por_direito_economico") => {
+    if (!encerrando) return;
+    startDecisao(async () => {
+      const r = await encerrarExclusividade(encerrando.id, decisao, motivoEncerramento);
+      if (r.ok) {
+        toast.success(
+          decisao === "encerrada"
+            ? "Exclusividade encerrada — a cidade voltou a ficar Livre."
+            : "Direito econômico mantido — a cidade segue travada até o fim do contrato."
+        );
+        setEncerrando(null);
+        setMotivoEncerramento("");
+      } else {
+        toast.error(r.erro ?? "Não foi possível concluir.");
+      }
+    });
+  };
 
   const decidir = (
     id: string,
@@ -187,6 +210,7 @@ export function TerritoriosCliente({
                     <TableHead className="hidden sm:table-cell">Produto</TableHead>
                     <TableHead className="hidden md:table-cell">Desde</TableHead>
                     <TableHead>Status</TableHead>
+                    <TableHead className="w-24" />
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -203,7 +227,24 @@ export function TerritoriosCliente({
                         {formatarData(a.data_inicio)}
                       </TableCell>
                       <TableCell>
-                        <SeloTerritorio status="exclusiva" />
+                        {a.status === "mantida_por_direito_economico" ? (
+                          <Pilula tom="info">Direito econômico</Pilula>
+                        ) : ["encerrada", "cancelada"].includes(a.status) ? (
+                          <Pilula tom="neutro">Encerrada</Pilula>
+                        ) : (
+                          <SeloTerritorio status="exclusiva" />
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {!["encerrada", "cancelada"].includes(a.status) && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setEncerrando(a)}
+                          >
+                            Encerrar
+                          </Button>
+                        )}
                       </TableCell>
                     </TableRow>
                   ))}
@@ -213,6 +254,76 @@ export function TerritoriosCliente({
           )}
         </TabsContent>
       </Tabs>
+
+      {/* Encerrar exclusividade (só Governança) */}
+      <Sheet
+        open={!!encerrando}
+        onOpenChange={(a) => {
+          if (!a) {
+            setEncerrando(null);
+            setMotivoEncerramento("");
+          }
+        }}
+      >
+        <SheetContent className="w-full sm:max-w-md">
+          {encerrando && (
+            <>
+              <SheetHeader>
+                <SheetTitle>
+                  Encerrar exclusividade —{" "}
+                  {encerrando.municipios
+                    ? `${encerrando.municipios.nome} · ${encerrando.municipios.uf}`
+                    : ""}
+                </SheetTitle>
+                <SheetDescription>
+                  {nomeParceiro(encerrando.parceiros_rede)} —{" "}
+                  {encerrando.produtos?.nome_produto}. Esta decisão fica
+                  registrada na auditoria.
+                </SheetDescription>
+              </SheetHeader>
+
+              <div className="space-y-4 px-4 pb-6">
+                <div className="space-y-1.5">
+                  <Label htmlFor="motivo-exclusiva">
+                    Motivo <span className="text-erro">*</span>
+                  </Label>
+                  <Textarea
+                    id="motivo-exclusiva"
+                    rows={3}
+                    value={motivoEncerramento}
+                    onChange={(e) => setMotivoEncerramento(e.target.value)}
+                    placeholder="Ex.: distrato do contrato nº 01/2026; renegociação; erro de cadastro…"
+                  />
+                </div>
+
+                <Separator />
+
+                <Button
+                  variant="destructive"
+                  className="w-full"
+                  disabled={decidindo || !motivoEncerramento.trim()}
+                  onClick={() => concluirEncerramento("encerrada")}
+                >
+                  Encerrar exclusividade — a cidade fica Livre
+                </Button>
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  disabled={decidindo || !motivoEncerramento.trim()}
+                  onClick={() => concluirEncerramento("mantida_por_direito_economico")}
+                >
+                  Manter direito econômico — travada até o fim do contrato
+                </Button>
+                <p className="text-xs text-muted-foreground">
+                  No direito econômico, o Canal descredenciado continua recebendo
+                  as comissões deste cliente e a cidade permanece indisponível
+                  para outros Canais até o contrato com o ente público terminar.
+                </p>
+              </div>
+            </>
+          )}
+        </SheetContent>
+      </Sheet>
 
       {/* Detalhe + decisão da Governança */}
       <Sheet open={!!detalhe} onOpenChange={(a) => !a && setDetalhe(null)}>
