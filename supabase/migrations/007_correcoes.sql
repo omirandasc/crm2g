@@ -255,3 +255,12 @@ alter table public.empresas_portfolio
   add column if not exists condicoes_financeiras text,
   add column if not exists modelo_distribuicao text,
   add column if not exists remuneracao_canal text;
+
+-- ── Busca de municípios sem acento ───────────────────────────────
+create extension if not exists unaccent;
+create or replace function public.fn_sem_acento(texto text)
+returns text language sql immutable parallel safe as
+$$ select lower(public.unaccent(texto)) $$;
+alter table public.municipios
+  add column nome_busca text generated always as (public.fn_sem_acento(nome)) stored;
+create index idx_municipios_nome_busca on public.municipios (nome_busca text_pattern_ops);

@@ -53,7 +53,13 @@ export function CampoMunicipio({
         .select("id, nome, uf, populacao")
         .order("populacao", { ascending: false, nullsFirst: false })
         .limit(15);
-      if (busca) consulta = consulta.ilike("nome", `${busca}%`);
+      if (busca) {
+        const termo = busca
+          .normalize("NFD")
+          .replace(/[̀-ͯ]/g, "")
+          .toLowerCase();
+        consulta = consulta.ilike("nome_busca", `${termo}%`);
+      }
       if (ufs && ufs.length > 0) consulta = consulta.in("uf", ufs);
       const { data } = await consulta;
       setOpcoes(data ?? []);

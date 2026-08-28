@@ -30,7 +30,12 @@ export default async function MunicipiosPage({
     .order("nome")
     .range(de, de + POR_PAGINA - 1);
 
-  if (q) consulta = consulta.ilike("nome", `%${q}%`);
+  // Busca ignorando acentos: normaliza o termo e consulta a coluna nome_busca
+  const termoNormalizado = q
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .toLowerCase();
+  if (q) consulta = consulta.ilike("nome_busca", `%${termoNormalizado}%`);
   if (uf) consulta = consulta.eq("uf", uf);
 
   const { data: municipios, count } = await consulta;
