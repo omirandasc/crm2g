@@ -2,9 +2,16 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { Plus, Search, Store, Pencil } from "lucide-react";
+import { Plus, Search, Store, Pencil, ArrowUp, ArrowDown, ChevronsUpDown, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -109,12 +116,98 @@ export function FormParceiro({ parceiro }: { parceiro?: ParceiroLinha | null }) 
   );
 }
 
+type ColunaOrdenavel = "parceiro" | "tipo" | "uf" | "responsavel" | "status";
+
+// Ordem do funil de credenciamento, com inativos/encerrados no fim
+const ORDEM_STATUS_PARCEIRO = [
+  "prospectado",
+  "em_qualificacao",
+  "contrato_em_elaboracao",
+  "ativo",
+  "suspenso",
+  "inativo",
+  "descredenciado",
+  "encerrado",
+];
+
+function compararTexto(a: string | null | undefined, b: string | null | undefined) {
+  if (!a && !b) return 0;
+  if (!a) return 1;
+  if (!b) return -1;
+  return a.localeCompare(b, "pt-BR", { sensitivity: "base" });
+}
+
+function ufsDe(p: ParceiroLinha) {
+  return p.ufs_credenciamento?.length
+    ? p.ufs_credenciamento.join(", ")
+    : p.uf_credenciamento ?? null;
+}
+
+function compararPorColuna(a: ParceiroLinha, b: ParceiroLinha, coluna: ColunaOrdenavel) {
+  switch (coluna) {
+    case "parceiro":
+      return compararTexto(a.nome_fantasia || a.razao_social, b.nome_fantasia || b.razao_social);
+    case "tipo":
+      return compararTexto(
+        TIPOS_PARCEIRO[a.tipo_parceiro] ?? a.tipo_parceiro,
+        TIPOS_PARCEIRO[b.tipo_parceiro] ?? b.tipo_parceiro
+      );
+    case "uf":
+      return compararTexto(ufsDe(a), ufsDe(b));
+    case "responsavel":
+      return compararTexto(a.responsavel_principal, b.responsavel_principal);
+    case "status": {
+      const ia = ORDEM_STATUS_PARCEIRO.indexOf(a.status);
+      const ib = ORDEM_STATUS_PARCEIRO.indexOf(b.status);
+      return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib);
+    }
+  }
+}
+
 export function RedeCliente({ parceiros }: { parceiros: ParceiroLinha[] }) {
   const [busca, setBusca] = React.useState("");
+  const [filtroStatus, setFiltroStatus] = React.useState("todos");
+  const [ordem, setOrdem] = React.useState<{ coluna: ColunaOrdenavel; desc: boolean } | null>(null);
   const [novoAberto, setNovoAberto] = React.useState(false);
   const router = useRouter();
 
+  const ordenarPor = (coluna: ColunaOrdenavel) =>
+    setOrdem((atual) =>
+      atual?.coluna === coluna ? { coluna, desc: !atual.desc } : { coluna, desc: false }
+    );
+
+  const CabecalhoOrdenavel = ({
+    coluna,
+    rotulo,
+    className,
+  }: {
+    coluna: ColunaOrdenavel;
+    rotulo: string;
+    className?: string;
+  }) => (
+    <TableHead className={className}>
+      <button
+        type="button"
+        onClick={() => ordenarPor(coluna)}
+        className="inline-flex items-center gap-1 hover:text-foreground"
+        title={`Ordenar por ${rotulo.toLowerCase()}`}
+      >
+        {rotulo}
+        {ordem?.coluna === coluna ? (
+          ordem.desc ? (
+            <ArrowDown className="size-3.5 text-marca-600" />
+          ) : (
+            <ArrowUp className="size-3.5 text-marca-600" />
+          )
+        ) : (
+          <ChevronsUpDown className="size-3 opacity-40" />
+        )}
+      </button>
+    </TableHead>
+  );
+
   const filtrados = parceiros.filter((p) => {
+    if (filtroStatus !== "todos" && p.status !== filtroStatus) return false;
     const termo = busca.toLowerCase();
     return (
       p.razao_social.toLowerCase().includes(termo) ||
@@ -122,6 +215,12 @@ export function RedeCliente({ parceiros }: { parceiros: ParceiroLinha[] }) {
       (p.cnpj ?? "").includes(termo)
     );
   });
+
+  const exibidos = ordem
+    ? [...filtrados].sort(
+        (a, b) => compararPorColuna(a, b, ordem.coluna) * (ordem.desc ? -1 : 1)
+      )
+    : filtrados;
 
   return (
     <div className="space-y-5">
@@ -136,6 +235,29 @@ export function RedeCliente({ parceiros }: { parceiros: ParceiroLinha[] }) {
             className="pl-8"
           />
         </div>
+        <Select
+          value={filtroStatus}
+          onValueChange={(v) => setFiltroStatus((v as string) ?? "todos")}
+          items={{ todos: "Todos os status", ...STATUS_PARCEIRO }}
+        >
+          <SelectTrigger className="w-44">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="todos">Todos os status</SelectItem>
+            {Object.entries(STATUS_PARCEIRO).map(([valor, rotulo]) => (
+              <SelectItem key={valor} value={valor}>
+                {rotulo}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {filtroStatus !== "todos" && (
+          <Button variant="ghost" size="sm" onClick={() => setFiltroStatus("todos")}>
+            <X className="size-3.5" />
+            Limpar filtro
+          </Button>
+        )}
         <Button onClick={() => setNovoAberto(true)}>
           <Plus className="size-4" />
           Novo parceiro
@@ -159,16 +281,16 @@ export function RedeCliente({ parceiros }: { parceiros: ParceiroLinha[] }) {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Parceiro</TableHead>
-                <TableHead className="hidden md:table-cell">Tipo</TableHead>
-                <TableHead className="hidden sm:table-cell">UF credenciada</TableHead>
-                <TableHead className="hidden lg:table-cell">Responsável</TableHead>
-                <TableHead>Status</TableHead>
+                <CabecalhoOrdenavel coluna="parceiro" rotulo="Parceiro" />
+                <CabecalhoOrdenavel coluna="tipo" rotulo="Tipo" className="hidden md:table-cell" />
+                <CabecalhoOrdenavel coluna="uf" rotulo="UF credenciada" className="hidden sm:table-cell" />
+                <CabecalhoOrdenavel coluna="responsavel" rotulo="Responsável" className="hidden lg:table-cell" />
+                <CabecalhoOrdenavel coluna="status" rotulo="Status" />
                 <TableHead className="w-10" />
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filtrados.map((p) => (
+              {exibidos.map((p) => (
                 <TableRow key={p.id} className="cursor-pointer" onClick={() => router.push(`/rede/${p.id}`)}>
                   <TableCell>
                     <span className="font-medium">{p.nome_fantasia || p.razao_social}</span>
@@ -199,10 +321,10 @@ export function RedeCliente({ parceiros }: { parceiros: ParceiroLinha[] }) {
                   </TableCell>
                 </TableRow>
               ))}
-              {filtrados.length === 0 && (
+              {exibidos.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
-                    Nenhum parceiro encontrado com essa busca.
+                    Nenhum parceiro encontrado com essa busca ou filtro.
                   </TableCell>
                 </TableRow>
               )}
