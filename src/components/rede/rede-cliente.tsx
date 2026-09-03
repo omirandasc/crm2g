@@ -26,10 +26,10 @@ import {
   CampoTexto,
   CampoTextoLongo,
   CampoSelecao,
-  CampoUF,
   CampoUFsMultiplas,
   SecaoFormulario,
 } from "@/components/cadastros/campos";
+import { BlocoEndereco } from "@/components/cadastros/bloco-endereco";
 import {
   STATUS_PARCEIRO,
   TOM_STATUS_PARCEIRO,
@@ -94,20 +94,7 @@ export function FormParceiro({ parceiro }: { parceiro?: ParceiroLinha | null }) 
         valorInicial={(parceiro?.limite_cidades_preferenciais ?? 30).toString()}
       />
 
-      <SecaoFormulario titulo="Endereço" />
-      <div className="grid grid-cols-[130px_1fr] gap-3">
-        <CampoTexto rotulo="CEP" nome="cep" valorInicial={parceiro?.cep} placeholder="00000-000" />
-        <CampoTexto rotulo="Rua / logradouro" nome="logradouro" valorInicial={parceiro?.logradouro} placeholder="Ex.: Av. Centenário" />
-      </div>
-      <div className="grid grid-cols-[110px_1fr] gap-3">
-        <CampoTexto rotulo="Número" nome="numero" valorInicial={parceiro?.numero} />
-        <CampoTexto rotulo="Complemento" nome="complemento" valorInicial={parceiro?.complemento} placeholder="Sala, andar, bloco…" />
-      </div>
-      <div className="grid grid-cols-[1fr_1fr_90px] gap-3">
-        <CampoTexto rotulo="Bairro" nome="bairro" valorInicial={parceiro?.bairro} />
-        <CampoTexto rotulo="Cidade" nome="cidade" valorInicial={parceiro?.cidade} />
-        <CampoUF nome="uf" valorInicial={parceiro?.uf} />
-      </div>
+      <BlocoEndereco dados={parceiro} />
 
       <SecaoFormulario titulo="Contatos" />
       <div className="grid grid-cols-2 gap-3">

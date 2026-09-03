@@ -20,6 +20,11 @@ export function CampoTexto({
   obrigatorio,
   tipo = "text",
   placeholder,
+  valor,
+  aoMudar,
+  aoSairDoCampo,
+  inputMode,
+  extra,
 }: {
   rotulo: string;
   nome: string;
@@ -27,21 +32,36 @@ export function CampoTexto({
   obrigatorio?: boolean;
   tipo?: string;
   placeholder?: string;
+  /** Use valor + aoMudar para campo controlado (ex.: preenchido pelo CEP). */
+  valor?: string;
+  aoMudar?: (valor: string) => void;
+  aoSairDoCampo?: () => void;
+  inputMode?: "text" | "numeric";
+  /** Conteúdo à direita do campo (ex.: indicador de busca). */
+  extra?: React.ReactNode;
 }) {
+  const controlado = valor !== undefined && aoMudar !== undefined;
   return (
     <div className="space-y-1.5">
       <Label htmlFor={nome}>
         {rotulo}
         {obrigatorio && <span className="text-erro"> *</span>}
       </Label>
-      <Input
-        id={nome}
-        name={nome}
-        type={tipo}
-        defaultValue={valorInicial ?? ""}
-        required={obrigatorio}
-        placeholder={placeholder}
-      />
+      <div className={extra ? "relative" : undefined}>
+        <Input
+          id={nome}
+          name={nome}
+          type={tipo}
+          inputMode={inputMode}
+          {...(controlado
+            ? { value: valor, onChange: (e) => aoMudar(e.target.value) }
+            : { defaultValue: valorInicial ?? "" })}
+          onBlur={aoSairDoCampo}
+          required={obrigatorio}
+          placeholder={placeholder}
+        />
+        {extra}
+      </div>
     </div>
   );
 }

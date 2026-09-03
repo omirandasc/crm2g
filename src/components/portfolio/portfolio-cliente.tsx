@@ -28,9 +28,9 @@ import {
   CampoTexto,
   CampoTextoLongo,
   CampoSelecao,
-  CampoUF,
   SecaoFormulario,
 } from "@/components/cadastros/campos";
+import { BlocoEndereco } from "@/components/cadastros/bloco-endereco";
 import { STATUS_EMPRESA, TOM_STATUS_EMPRESA } from "@/lib/dominio";
 import { salvarEmpresa } from "@/lib/acoes/cadastros";
 
@@ -83,20 +83,7 @@ export function FormEmpresa({ empresa }: { empresa?: EmpresaLinha | null }) {
         />
       </div>
 
-      <SecaoFormulario titulo="Endereço" />
-      <div className="grid grid-cols-[130px_1fr] gap-3">
-        <CampoTexto rotulo="CEP" nome="cep" valorInicial={empresa?.cep} placeholder="00000-000" />
-        <CampoTexto rotulo="Rua / logradouro" nome="logradouro" valorInicial={empresa?.logradouro} placeholder="Ex.: Av. Centenário" />
-      </div>
-      <div className="grid grid-cols-[110px_1fr] gap-3">
-        <CampoTexto rotulo="Número" nome="numero" valorInicial={empresa?.numero} />
-        <CampoTexto rotulo="Complemento" nome="complemento" valorInicial={empresa?.complemento} placeholder="Sala, andar, bloco…" />
-      </div>
-      <div className="grid grid-cols-[1fr_1fr_90px] gap-3">
-        <CampoTexto rotulo="Bairro" nome="bairro" valorInicial={empresa?.bairro} />
-        <CampoTexto rotulo="Cidade" nome="cidade" valorInicial={empresa?.cidade} />
-        <CampoUF nome="uf" valorInicial={empresa?.uf} />
-      </div>
+      <BlocoEndereco dados={empresa} />
 
       <SecaoFormulario titulo="Responsável principal" />
       <CampoTexto rotulo="Nome" nome="responsavel_principal" valorInicial={empresa?.responsavel_principal} />
