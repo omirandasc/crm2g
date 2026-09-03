@@ -267,3 +267,78 @@ export async function atualizarFaseGovTech(
   revalidatePath("/portfolio");
   return { ok: true, momento: Date.now() };
 }
+
+// ── Importar sócios da base pública da Receita Federal (BrasilAPI) ──
+type SocioReceita = { nome_socio?: string; qualificacao_socio?: string };
+
+export async function importarSociosDaReceita(
+  entidade: "empresa_portfolio" | "parceiro_rede",
+  entidadeId: string,
+  cnpj: string | null
+): Promise<ResultadoAcao & { importados?: number; repetidos?: number }> {
+  const digitos = (cnpj ?? "").replace(/\D/g, "");
+  if (digitos.length !== 14) {
+    return {
+      erro: "Cadastre o CNPJ na aba Dados antes de importar os sócios.",
+      momento: Date.now(),
+    };
+  }
+
+  let qsa: SocioReceita[] = [];
+  try {
+    const resposta = await fetch(`https://brasilapi.com.br/api/cnpj/v1/${digitos}`, {
+      headers: { "User-Agent": "CRM DOISGE", Accept: "application/json" },
+      next: { revalidate: 3600 },
+    });
+    if (!resposta.ok) throw new Error(String(resposta.status));
+    const dados = (await resposta.json()) as { qsa?: SocioReceita[] };
+    qsa = dados.qsa ?? [];
+  } catch {
+    return {
+      erro: "Não foi possível consultar a Receita agora. Tente de novo em instantes.",
+      momento: Date.now(),
+    };
+  }
+
+  if (qsa.length === 0) {
+    return {
+      erro: "A Receita não informa quadro societário para este CNPJ.",
+      momento: Date.now(),
+    };
+  }
+
+  const supabase = await createClient();
+  const { data: existentes } = await supabase
+    .from("socios")
+    .select("nome")
+    .eq("entidade", entidade)
+    .eq("entidade_id", entidadeId);
+
+  const jaCadastrados = new Set(
+    (existentes ?? []).map((s) => (s.nome ?? "").trim().toLocaleLowerCase("pt-BR"))
+  );
+
+  const hoje = new Date().toLocaleDateString("pt-BR");
+  const novos = qsa
+    .filter((s) => s.nome_socio && !jaCadastrados.has(s.nome_socio.trim().toLocaleLowerCase("pt-BR")))
+    .map((s) => ({
+      entidade,
+      entidade_id: entidadeId,
+      nome: s.nome_socio!.trim(),
+      observacoes: [s.qualificacao_socio, `Importado da Receita Federal em ${hoje}`]
+        .filter(Boolean)
+        .join(" · "),
+    }));
+
+  const repetidos = qsa.length - novos.length;
+
+  if (novos.length === 0) {
+    return { ok: true, importados: 0, repetidos, momento: Date.now() };
+  }
+
+  const { error } = await supabase.from("socios").insert(novos);
+  if (error) return { erro: error.message, momento: Date.now() };
+
+  revalidatePath(rotaDaEntidade(entidade, entidadeId));
+  return { ok: true, importados: novos.length, repetidos, momento: Date.now() };
+}

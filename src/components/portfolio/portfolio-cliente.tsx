@@ -31,6 +31,8 @@ import {
   SecaoFormulario,
 } from "@/components/cadastros/campos";
 import { BlocoEndereco } from "@/components/cadastros/bloco-endereco";
+import { BlocoIdentificacao } from "@/components/cadastros/bloco-identificacao";
+import { ProvedorCadastro, CampoTextoCadastro } from "@/components/cadastros/contexto-cadastro";
 import { STATUS_EMPRESA, TOM_STATUS_EMPRESA } from "@/lib/dominio";
 import { salvarEmpresa } from "@/lib/acoes/cadastros";
 
@@ -58,14 +60,16 @@ export type EmpresaLinha = {
 };
 
 export function FormEmpresa({ empresa }: { empresa?: EmpresaLinha | null }) {
+  const r = empresa;
   return (
-    <>
-      <SecaoFormulario titulo="Identificação" />
-      <CampoTexto rotulo="Razão social" nome="razao_social" obrigatorio valorInicial={empresa?.razao_social} placeholder="Ex.: Sentinela Tecnologia Ltda." />
-      <div className="grid grid-cols-2 gap-3">
-        <CampoTexto rotulo="Nome fantasia" nome="nome_fantasia" valorInicial={empresa?.nome_fantasia} />
-        <CampoTexto rotulo="CNPJ" nome="cnpj" valorInicial={empresa?.cnpj} placeholder="00.000.000/0000-00" />
-      </div>
+    <ProvedorCadastro
+      iniciais={{
+        razao_social: r?.razao_social, nome_fantasia: r?.nome_fantasia, cnpj: r?.cnpj,
+        email_institucional: r?.email_institucional, telefone_responsavel: r?.telefone_responsavel,
+        cep: r?.cep, logradouro: r?.logradouro, numero: r?.numero, complemento: r?.complemento, bairro: r?.bairro, cidade: r?.cidade, uf: r?.uf,
+      }}
+    >
+      <BlocoIdentificacao placeholderRazao="Ex.: Sentinela Tecnologia Ltda." />
 
       <SecaoFormulario titulo="Perfil" />
       <div className="grid grid-cols-2 gap-3">
@@ -74,22 +78,21 @@ export function FormEmpresa({ empresa }: { empresa?: EmpresaLinha | null }) {
       </div>
       <div className="grid grid-cols-2 gap-3">
         <CampoTexto rotulo="Site" nome="site" valorInicial={empresa?.site} placeholder="https://…" />
-        <CampoTexto
+        <CampoTextoCadastro
           rotulo="E-mail institucional"
           nome="email_institucional"
           tipo="email"
-          valorInicial={empresa?.email_institucional}
           placeholder="contato@empresa.com.br"
         />
       </div>
 
-      <BlocoEndereco dados={empresa} />
+      <BlocoEndereco />
 
       <SecaoFormulario titulo="Responsável principal" />
       <CampoTexto rotulo="Nome" nome="responsavel_principal" valorInicial={empresa?.responsavel_principal} />
       <div className="grid grid-cols-2 gap-3">
         <CampoTexto rotulo="E-mail" nome="email_responsavel" tipo="email" valorInicial={empresa?.email_responsavel} />
-        <CampoTexto rotulo="Telefone" nome="telefone_responsavel" valorInicial={empresa?.telefone_responsavel} />
+        <CampoTextoCadastro rotulo="Telefone" nome="telefone_responsavel" />
       </div>
 
 
@@ -101,7 +104,7 @@ export function FormEmpresa({ empresa }: { empresa?: EmpresaLinha | null }) {
       </div>
       <CampoTexto rotulo="Chave Pix" nome="chave_pix" valorInicial={empresa?.dados_bancarios?.chave_pix} />
       <CampoTextoLongo rotulo="Observações" nome="observacoes" valorInicial={empresa?.observacoes} />
-    </>
+    </ProvedorCadastro>
   );
 }
 

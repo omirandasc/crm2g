@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Plus, Trash2, FileText, UserRound } from "lucide-react";
+import { Plus, Trash2, FileText, UserRound, DownloadCloud, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -22,7 +22,9 @@ import {
   removerSocio,
   salvarCertidao,
   removerCertidao,
+  importarSociosDaReceita,
 } from "@/lib/acoes/complementos";
+import { apenasDigitos, mascararCPF, validarCPF } from "@/lib/documentos";
 import { formatarData } from "@/lib/utils";
 
 export type SocioLinha = {
@@ -41,17 +43,61 @@ export type CertidaoLinha = {
   arquivo_url: string | null;
 };
 
+/** CPF com máscara e conferência dos dígitos verificadores (cálculo local). */
+function CampoCPF() {
+  const [cpf, setCpf] = React.useState("");
+  const invalido = apenasDigitos(cpf).length === 11 && !validarCPF(cpf);
+  return (
+    <div className="space-y-1">
+      <CampoTexto
+        rotulo="CPF"
+        nome="cpf"
+        valor={cpf}
+        aoMudar={(v) => setCpf(mascararCPF(v))}
+        inputMode="numeric"
+        placeholder="000.000.000-00"
+      />
+      {invalido && (
+        <p className="flex items-center gap-1 text-xs text-erro">
+          <AlertTriangle className="size-3" />
+          CPF inválido — confira os números.
+        </p>
+      )}
+    </div>
+  );
+}
+
 export function BlocoSocios({
   entidade,
   entidadeId,
+  cnpj,
   socios,
 }: {
   entidade: "empresa_portfolio" | "parceiro_rede";
   entidadeId: string;
+  cnpj?: string | null;
   socios: SocioLinha[];
 }) {
   const [aberto, setAberto] = React.useState(false);
   const [removendo, startRemocao] = React.useTransition();
+  const [importando, startImportacao] = React.useTransition();
+
+  const importarDaReceita = () =>
+    startImportacao(async () => {
+      const r = await importarSociosDaReceita(entidade, entidadeId, cnpj ?? null);
+      if (!r.ok) {
+        toast.error(r.erro ?? "Não foi possível importar.");
+        return;
+      }
+      if ((r.importados ?? 0) === 0) {
+        toast.info("Nenhum sócio novo — o quadro já está igual ao da Receita.");
+      } else {
+        toast.success(
+          `${r.importados} sócio(s) importado(s) da Receita Federal.` +
+            ((r.repetidos ?? 0) > 0 ? ` ${r.repetidos} já estava(m) cadastrado(s).` : "")
+        );
+      }
+    });
 
   const somaPercentual = socios.reduce((acc, s) => acc + (s.percentual ?? 0), 0);
 
@@ -61,10 +107,25 @@ export function BlocoSocios({
         <p className="text-sm text-muted-foreground">
           Quadro societário{somaPercentual > 0 && ` — ${somaPercentual}% cadastrado`}.
         </p>
-        <Button onClick={() => setAberto(true)}>
-          <Plus className="size-4" />
-          Novo sócio
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            disabled={importando || !cnpj}
+            onClick={importarDaReceita}
+            title={
+              cnpj
+                ? "Busca o quadro societário na base pública da Receita Federal"
+                : "Cadastre o CNPJ na aba Dados para habilitar"
+            }
+          >
+            <DownloadCloud className="size-4" />
+            {importando ? "Importando…" : "Importar da Receita"}
+          </Button>
+          <Button onClick={() => setAberto(true)}>
+            <Plus className="size-4" />
+            Novo sócio
+          </Button>
+        </div>
       </div>
 
       {socios.length === 0 ? (
@@ -129,7 +190,7 @@ export function BlocoSocios({
         <input type="hidden" name="entidade_id" value={entidadeId} />
         <CampoTexto rotulo="Nome" nome="nome" obrigatorio />
         <div className="grid grid-cols-2 gap-3">
-          <CampoTexto rotulo="CPF" nome="cpf" placeholder="000.000.000-00" />
+          <CampoCPF />
           <CampoTexto rotulo="Participação (%)" nome="percentual" tipo="number" />
         </div>
         <div className="grid grid-cols-2 gap-3">

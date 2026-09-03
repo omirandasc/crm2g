@@ -30,6 +30,8 @@ import {
   SecaoFormulario,
 } from "@/components/cadastros/campos";
 import { BlocoEndereco } from "@/components/cadastros/bloco-endereco";
+import { BlocoIdentificacao } from "@/components/cadastros/bloco-identificacao";
+import { ProvedorCadastro, CampoTextoCadastro } from "@/components/cadastros/contexto-cadastro";
 import {
   STATUS_PARCEIRO,
   TOM_STATUS_PARCEIRO,
@@ -63,14 +65,16 @@ export type ParceiroLinha = {
 };
 
 export function FormParceiro({ parceiro }: { parceiro?: ParceiroLinha | null }) {
+  const r = parceiro;
   return (
-    <>
-      <SecaoFormulario titulo="Identificação" />
-      <CampoTexto rotulo="Razão social" nome="razao_social" obrigatorio valorInicial={parceiro?.razao_social} />
-      <div className="grid grid-cols-2 gap-3">
-        <CampoTexto rotulo="Nome fantasia" nome="nome_fantasia" valorInicial={parceiro?.nome_fantasia} />
-        <CampoTexto rotulo="CNPJ" nome="cnpj" valorInicial={parceiro?.cnpj} placeholder="00.000.000/0000-00" />
-      </div>
+    <ProvedorCadastro
+      iniciais={{
+        razao_social: r?.razao_social, nome_fantasia: r?.nome_fantasia, cnpj: r?.cnpj,
+        telefone_responsavel: r?.telefone_responsavel,
+        cep: r?.cep, logradouro: r?.logradouro, numero: r?.numero, complemento: r?.complemento, bairro: r?.bairro, cidade: r?.cidade, uf: r?.uf,
+      }}
+    >
+      <BlocoIdentificacao />
 
       <SecaoFormulario titulo="Perfil comercial" />
       <div className="grid grid-cols-2 gap-3">
@@ -94,7 +98,7 @@ export function FormParceiro({ parceiro }: { parceiro?: ParceiroLinha | null }) 
         valorInicial={(parceiro?.limite_cidades_preferenciais ?? 30).toString()}
       />
 
-      <BlocoEndereco dados={parceiro} />
+      <BlocoEndereco />
 
       <SecaoFormulario titulo="Contatos" />
       <div className="grid grid-cols-2 gap-3">
@@ -103,7 +107,7 @@ export function FormParceiro({ parceiro }: { parceiro?: ParceiroLinha | null }) 
       </div>
       <div className="grid grid-cols-2 gap-3">
         <CampoTexto rotulo="E-mail" nome="email_responsavel" tipo="email" valorInicial={parceiro?.email_responsavel} />
-        <CampoTexto rotulo="Telefone" nome="telefone_responsavel" valorInicial={parceiro?.telefone_responsavel} />
+        <CampoTextoCadastro rotulo="Telefone" nome="telefone_responsavel" />
       </div>
 
 
@@ -115,7 +119,7 @@ export function FormParceiro({ parceiro }: { parceiro?: ParceiroLinha | null }) 
       </div>
       <CampoTexto rotulo="Chave Pix" nome="chave_pix" valorInicial={parceiro?.dados_bancarios?.chave_pix} />
       <CampoTextoLongo rotulo="Observações" nome="observacoes" valorInicial={parceiro?.observacoes} />
-    </>
+    </ProvedorCadastro>
   );
 }
 

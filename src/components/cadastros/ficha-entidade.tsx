@@ -104,7 +104,12 @@ export function FichaEntidade({
       </TabsContent>
 
       <TabsContent value="socios" className="mt-4">
-        <BlocoSocios entidade={entidade} entidadeId={registroId} socios={socios} />
+        <BlocoSocios
+          entidade={entidade}
+          entidadeId={registroId}
+          cnpj={empresa?.cnpj ?? parceiro?.cnpj ?? null}
+          socios={socios}
+        />
       </TabsContent>
 
       <TabsContent value="certidoes" className="mt-4">

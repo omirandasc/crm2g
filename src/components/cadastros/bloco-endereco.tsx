@@ -3,16 +3,8 @@
 import * as React from "react";
 import { Check, MapPin } from "lucide-react";
 import { CampoTexto, CampoUF, SecaoFormulario } from "@/components/cadastros/campos";
-
-export type EnderecoInicial = {
-  cep?: string | null;
-  logradouro?: string | null;
-  numero?: string | null;
-  complemento?: string | null;
-  bairro?: string | null;
-  cidade?: string | null;
-  uf?: string | null;
-} | null;
+import { CampoTextoCadastro, useCadastro, useCampo } from "@/components/cadastros/contexto-cadastro";
+import { apenasDigitos } from "@/lib/documentos";
 
 type RespostaViaCEP = {
   erro?: boolean | string;
@@ -23,16 +15,14 @@ type RespostaViaCEP = {
 };
 
 /**
- * Seção de endereço com preenchimento automático pelo CEP (ViaCEP).
- * Ao completar 8 dígitos, busca e preenche rua, bairro, cidade e UF —
- * tudo continua editável à mão, e a falha na consulta nunca bloqueia o cadastro.
+ * Endereço com preenchimento automático pelo CEP (ViaCEP). Ao completar 8
+ * dígitos, busca e preenche rua, bairro, cidade e UF — tudo segue editável
+ * à mão, e a falha na consulta nunca bloqueia o cadastro.
  */
-export function BlocoEndereco({ dados }: { dados?: EnderecoInicial }) {
-  const [cep, setCep] = React.useState(dados?.cep ?? "");
-  const [logradouro, setLogradouro] = React.useState(dados?.logradouro ?? "");
-  const [bairro, setBairro] = React.useState(dados?.bairro ?? "");
-  const [cidade, setCidade] = React.useState(dados?.cidade ?? "");
-  const [uf, setUf] = React.useState(dados?.uf ?? "");
+export function BlocoEndereco() {
+  const { preencher } = useCadastro();
+  const [cep, definirCep] = useCampo("cep");
+  const [uf] = useCampo("uf");
   const [estado, setEstado] = React.useState<"parado" | "buscando" | "ok" | "aviso">("parado");
   const [aviso, setAviso] = React.useState<string | null>(null);
   const ultimoBuscado = React.useRef("");
@@ -51,10 +41,15 @@ export function BlocoEndereco({ dados }: { dados?: EnderecoInicial }) {
         setAviso("CEP não encontrado — preencha o endereço à mão.");
         return;
       }
-      if (dados.logradouro) setLogradouro(dados.logradouro);
-      if (dados.bairro) setBairro(dados.bairro);
-      if (dados.localidade) setCidade(dados.localidade);
-      if (dados.uf) setUf(dados.uf);
+      preencher(
+        {
+          logradouro: dados.logradouro ?? "",
+          bairro: dados.bairro ?? "",
+          cidade: dados.localidade ?? "",
+          uf: dados.uf ?? "",
+        },
+        { sobrescrever: true }
+      );
       setEstado("ok");
     } catch {
       setEstado("aviso");
@@ -63,8 +58,8 @@ export function BlocoEndereco({ dados }: { dados?: EnderecoInicial }) {
   };
 
   const aoDigitarCep = (valor: string) => {
-    const digitos = valor.replace(/\D/g, "").slice(0, 8);
-    setCep(digitos.length > 5 ? `${digitos.slice(0, 5)}-${digitos.slice(5)}` : digitos);
+    const digitos = apenasDigitos(valor).slice(0, 8);
+    definirCep(digitos.length > 5 ? `${digitos.slice(0, 5)}-${digitos.slice(5)}` : digitos);
     if (digitos.length === 8) void buscarCep(digitos);
     else {
       setEstado("parado");
@@ -92,11 +87,9 @@ export function BlocoEndereco({ dados }: { dados?: EnderecoInicial }) {
             ) : null
           }
         />
-        <CampoTexto
+        <CampoTextoCadastro
           rotulo="Rua / logradouro"
           nome="logradouro"
-          valor={logradouro}
-          aoMudar={setLogradouro}
           placeholder="Ex.: Av. Centenário"
         />
       </div>
@@ -111,18 +104,17 @@ export function BlocoEndereco({ dados }: { dados?: EnderecoInicial }) {
       )}
 
       <div className="grid grid-cols-[110px_1fr] gap-3">
-        <CampoTexto rotulo="Número" nome="numero" valorInicial={dados?.numero} />
-        <CampoTexto
+        <CampoTextoCadastro rotulo="Número" nome="numero" />
+        <CampoTextoCadastro
           rotulo="Complemento"
           nome="complemento"
-          valorInicial={dados?.complemento}
           placeholder="Sala, andar, bloco…"
         />
       </div>
       <div className="grid grid-cols-[1fr_1fr_90px] gap-3">
-        <CampoTexto rotulo="Bairro" nome="bairro" valor={bairro} aoMudar={setBairro} />
-        <CampoTexto rotulo="Cidade" nome="cidade" valor={cidade} aoMudar={setCidade} />
-        {/* key remonta o seletor quando o CEP traz a UF */}
+        <CampoTextoCadastro rotulo="Bairro" nome="bairro" />
+        <CampoTextoCadastro rotulo="Cidade" nome="cidade" />
+        {/* key remonta o seletor quando CEP ou CNPJ trazem a UF */}
         <CampoUF key={uf || "sem-uf"} nome="uf" valorInicial={uf} />
       </div>
     </>
