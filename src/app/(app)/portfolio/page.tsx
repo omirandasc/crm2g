@@ -9,7 +9,7 @@ export default async function PortfolioPage() {
   const { data: empresas } = await supabase
     .from("empresas_portfolio")
     .select(
-      "id, razao_social, nome_fantasia, cnpj, cidade, uf, segmento, site, email_institucional, status, responsavel_principal, email_responsavel, telefone_responsavel, observacoes"
+      "id, razao_social, nome_fantasia, cnpj, cep, logradouro, numero, complemento, bairro, cidade, uf, segmento, site, email_institucional, status, responsavel_principal, email_responsavel, telefone_responsavel, observacoes"
     )
     .order("razao_social");
 

@@ -44,6 +44,11 @@ export type ParceiroLinha = {
   cnpj: string | null;
   tipo_parceiro: string;
   status: string;
+  cep: string | null;
+  logradouro: string | null;
+  numero: string | null;
+  complemento: string | null;
+  bairro: string | null;
   cidade: string | null;
   uf: string | null;
   uf_credenciamento: string | null;
@@ -72,10 +77,6 @@ export function FormParceiro({ parceiro }: { parceiro?: ParceiroLinha | null }) 
         <CampoSelecao rotulo="Tipo de parceiro" nome="tipo_parceiro" obrigatorio opcoes={TIPOS_PARCEIRO} valorInicial={parceiro?.tipo_parceiro ?? "revendedor_parceiro"} />
         <CampoSelecao rotulo="Status" nome="status" obrigatorio opcoes={STATUS_PARCEIRO} valorInicial={parceiro?.status ?? "prospectado"} />
       </div>
-      <div className="grid grid-cols-3 gap-3">
-        <CampoTexto rotulo="Cidade" nome="cidade" valorInicial={parceiro?.cidade} />
-        <CampoUF nome="uf" valorInicial={parceiro?.uf} />
-      </div>
       <CampoUFsMultiplas
         nome="ufs_credenciamento"
         valorInicial={
@@ -92,6 +93,21 @@ export function FormParceiro({ parceiro }: { parceiro?: ParceiroLinha | null }) 
         tipo="number"
         valorInicial={(parceiro?.limite_cidades_preferenciais ?? 30).toString()}
       />
+
+      <SecaoFormulario titulo="Endereço" />
+      <div className="grid grid-cols-[130px_1fr] gap-3">
+        <CampoTexto rotulo="CEP" nome="cep" valorInicial={parceiro?.cep} placeholder="00000-000" />
+        <CampoTexto rotulo="Rua / logradouro" nome="logradouro" valorInicial={parceiro?.logradouro} placeholder="Ex.: Av. Centenário" />
+      </div>
+      <div className="grid grid-cols-[110px_1fr] gap-3">
+        <CampoTexto rotulo="Número" nome="numero" valorInicial={parceiro?.numero} />
+        <CampoTexto rotulo="Complemento" nome="complemento" valorInicial={parceiro?.complemento} placeholder="Sala, andar, bloco…" />
+      </div>
+      <div className="grid grid-cols-[1fr_1fr_90px] gap-3">
+        <CampoTexto rotulo="Bairro" nome="bairro" valorInicial={parceiro?.bairro} />
+        <CampoTexto rotulo="Cidade" nome="cidade" valorInicial={parceiro?.cidade} />
+        <CampoUF nome="uf" valorInicial={parceiro?.uf} />
+      </div>
 
       <SecaoFormulario titulo="Contatos" />
       <div className="grid grid-cols-2 gap-3">

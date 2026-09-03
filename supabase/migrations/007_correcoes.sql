@@ -285,3 +285,18 @@ end $$;
 create trigger trg_encerrar_exclusiva_contrato
   after update of status_contrato on public.contratos
   for each row execute function public.fn_encerrar_exclusiva_com_contrato();
+
+-- ── Endereço completo para GovTechs e Canais ─────────────────────
+alter table public.empresas_portfolio
+  add column if not exists cep text,
+  add column if not exists logradouro text,
+  add column if not exists numero text,
+  add column if not exists complemento text,
+  add column if not exists bairro text;
+
+alter table public.parceiros_rede
+  add column if not exists cep text,
+  add column if not exists logradouro text,
+  add column if not exists numero text,
+  add column if not exists complemento text,
+  add column if not exists bairro text;

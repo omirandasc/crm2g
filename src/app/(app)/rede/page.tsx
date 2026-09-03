@@ -9,7 +9,7 @@ export default async function RedePage() {
   const { data: parceiros } = await supabase
     .from("parceiros_rede")
     .select(
-      "id, razao_social, nome_fantasia, cnpj, tipo_parceiro, status, cidade, uf, uf_credenciamento, ufs_credenciamento, limite_cidades_preferenciais, responsavel_principal, email_responsavel, telefone_responsavel, consultor_responsavel, observacoes"
+      "id, razao_social, nome_fantasia, cnpj, tipo_parceiro, status, cep, logradouro, numero, complemento, bairro, cidade, uf, uf_credenciamento, ufs_credenciamento, limite_cidades_preferenciais, responsavel_principal, email_responsavel, telefone_responsavel, consultor_responsavel, observacoes"
     )
     .order("razao_social");
 

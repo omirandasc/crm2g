@@ -39,6 +39,11 @@ export type EmpresaLinha = {
   razao_social: string;
   nome_fantasia: string | null;
   cnpj: string | null;
+  cep: string | null;
+  logradouro: string | null;
+  numero: string | null;
+  complemento: string | null;
+  bairro: string | null;
   cidade: string | null;
   uf: string | null;
   segmento: string | null;
@@ -67,10 +72,6 @@ export function FormEmpresa({ empresa }: { empresa?: EmpresaLinha | null }) {
         <CampoSelecao rotulo="Status" nome="status" obrigatorio opcoes={STATUS_EMPRESA} valorInicial={empresa?.status ?? "prospectada"} />
         <CampoTexto rotulo="Segmento" nome="segmento" valorInicial={empresa?.segmento} placeholder="Ex.: Defesa Civil" />
       </div>
-      <div className="grid grid-cols-[1fr_100px] gap-3">
-        <CampoTexto rotulo="Cidade" nome="cidade" valorInicial={empresa?.cidade} />
-        <CampoUF nome="uf" valorInicial={empresa?.uf} />
-      </div>
       <div className="grid grid-cols-2 gap-3">
         <CampoTexto rotulo="Site" nome="site" valorInicial={empresa?.site} placeholder="https://…" />
         <CampoTexto
@@ -80,6 +81,21 @@ export function FormEmpresa({ empresa }: { empresa?: EmpresaLinha | null }) {
           valorInicial={empresa?.email_institucional}
           placeholder="contato@empresa.com.br"
         />
+      </div>
+
+      <SecaoFormulario titulo="Endereço" />
+      <div className="grid grid-cols-[130px_1fr] gap-3">
+        <CampoTexto rotulo="CEP" nome="cep" valorInicial={empresa?.cep} placeholder="00000-000" />
+        <CampoTexto rotulo="Rua / logradouro" nome="logradouro" valorInicial={empresa?.logradouro} placeholder="Ex.: Av. Centenário" />
+      </div>
+      <div className="grid grid-cols-[110px_1fr] gap-3">
+        <CampoTexto rotulo="Número" nome="numero" valorInicial={empresa?.numero} />
+        <CampoTexto rotulo="Complemento" nome="complemento" valorInicial={empresa?.complemento} placeholder="Sala, andar, bloco…" />
+      </div>
+      <div className="grid grid-cols-[1fr_1fr_90px] gap-3">
+        <CampoTexto rotulo="Bairro" nome="bairro" valorInicial={empresa?.bairro} />
+        <CampoTexto rotulo="Cidade" nome="cidade" valorInicial={empresa?.cidade} />
+        <CampoUF nome="uf" valorInicial={empresa?.uf} />
       </div>
 
       <SecaoFormulario titulo="Responsável principal" />
