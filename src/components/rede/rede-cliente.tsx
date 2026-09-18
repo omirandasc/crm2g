@@ -35,8 +35,9 @@ import { ProvedorCadastro, CampoTextoCadastro } from "@/components/cadastros/con
 import {
   STATUS_PARCEIRO,
   TOM_STATUS_PARCEIRO,
-  TIPOS_PARCEIRO,
+  rotuloTiposParceiro,
 } from "@/lib/dominio";
+import { CampoTiposParceiro } from "@/components/rede/campo-tipos-parceiro";
 import { salvarParceiro } from "@/lib/acoes/cadastros";
 
 export type ParceiroLinha = {
@@ -45,6 +46,7 @@ export type ParceiroLinha = {
   nome_fantasia: string | null;
   cnpj: string | null;
   tipo_parceiro: string;
+  tipos_parceiro: string[] | null;
   status: string;
   cep: string | null;
   logradouro: string | null;
@@ -77,10 +79,16 @@ export function FormParceiro({ parceiro }: { parceiro?: ParceiroLinha | null }) 
       <BlocoIdentificacao />
 
       <SecaoFormulario titulo="Perfil comercial" />
-      <div className="grid grid-cols-2 gap-3">
-        <CampoSelecao rotulo="Tipo de parceiro" nome="tipo_parceiro" obrigatorio opcoes={TIPOS_PARCEIRO} valorInicial={parceiro?.tipo_parceiro ?? "revendedor_parceiro"} />
-        <CampoSelecao rotulo="Status" nome="status" obrigatorio opcoes={STATUS_PARCEIRO} valorInicial={parceiro?.status ?? "prospectado"} />
-      </div>
+      <CampoTiposParceiro
+        valorInicial={
+          parceiro?.tipos_parceiro?.length
+            ? parceiro.tipos_parceiro
+            : parceiro?.tipo_parceiro
+              ? [parceiro.tipo_parceiro]
+              : []
+        }
+      />
+      <CampoSelecao rotulo="Status" nome="status" obrigatorio opcoes={STATUS_PARCEIRO} valorInicial={parceiro?.status ?? "prospectado"} />
       <CampoUFsMultiplas
         nome="ufs_credenciamento"
         valorInicial={
@@ -156,8 +164,8 @@ function compararPorColuna(a: ParceiroLinha, b: ParceiroLinha, coluna: ColunaOrd
       return compararTexto(a.nome_fantasia || a.razao_social, b.nome_fantasia || b.razao_social);
     case "tipo":
       return compararTexto(
-        TIPOS_PARCEIRO[a.tipo_parceiro] ?? a.tipo_parceiro,
-        TIPOS_PARCEIRO[b.tipo_parceiro] ?? b.tipo_parceiro
+        rotuloTiposParceiro(a.tipos_parceiro, a.tipo_parceiro),
+        rotuloTiposParceiro(b.tipos_parceiro, b.tipo_parceiro)
       );
     case "uf":
       return compararTexto(ufsDe(a), ufsDe(b));
@@ -308,7 +316,7 @@ export function RedeCliente({ parceiros }: { parceiros: ParceiroLinha[] }) {
                     )}
                   </TableCell>
                   <TableCell className="hidden md:table-cell text-muted-foreground">
-                    {TIPOS_PARCEIRO[p.tipo_parceiro] ?? p.tipo_parceiro}
+                    {rotuloTiposParceiro(p.tipos_parceiro, p.tipo_parceiro)}
                   </TableCell>
                   <TableCell className="hidden sm:table-cell">
                     {p.ufs_credenciamento?.length

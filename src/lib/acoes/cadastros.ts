@@ -124,7 +124,14 @@ const esquemaParceiro = z.object({
   razao_social: obrigatorio("Informe a razão social do parceiro."),
   nome_fantasia: texto,
   cnpj: texto,
-  tipo_parceiro: obrigatorio("Escolha o tipo de parceiro."),
+  tipos_parceiro: z.preprocess(
+    (v) =>
+      String(v ?? "")
+        .split(",")
+        .map((s) => s.trim())
+        .filter((s) => ["canal_comercial", "revendedor_distribuidor", "parceiro_servico"].includes(s)),
+    z.array(z.string()).min(1, "Marque ao menos um tipo de parceiro.")
+  ),
   status: obrigatorio("Escolha um status."),
   cep: texto,
   logradouro: texto,
@@ -168,8 +175,9 @@ export async function salvarParceiro(
   const { id, banco, agencia, conta, chave_pix, ...resto } = dados.data;
   const campos = {
     ...resto,
-    // legado: primeira UF mantida na coluna antiga para compatibilidade
+    // legado: primeira UF e primeiro tipo espelhados nas colunas antigas
     uf_credenciamento: resto.ufs_credenciamento[0] ?? null,
+    tipo_parceiro: resto.tipos_parceiro[0],
     dados_bancarios: { banco, agencia, conta, chave_pix },
   };
   const supabase = await createClient();

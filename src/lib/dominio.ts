@@ -49,17 +49,14 @@ export function ehRede(perfil?: string | null) {
 
 export type StatusTerritorio = "livre" | "preferencial" | "exclusiva";
 
+// Etapas enxugadas no chamado de 15/09/2026 (lead, oportunidade cadastrada,
+// diagnóstico da dor, interesse validado, proposta solicitada e modelo de
+// contratação saíram do funil)
 export const ETAPAS_COMERCIAIS: Record<string, string> = {
-  lead_identificado: "Lead identificado",
-  oportunidade_cadastrada: "Oportunidade cadastrada",
   qualificacao_inicial: "Qualificação inicial",
-  diagnostico_da_dor: "Diagnóstico da dor",
   reuniao_realizada: "Reunião realizada",
   solucao_apresentada: "Solução apresentada",
-  interesse_validado: "Interesse validado",
-  proposta_solicitada: "Proposta solicitada",
   proposta_enviada: "Proposta enviada",
-  modelo_contratacao_definido: "Modelo de contratação definido",
   processo_compra_iniciado: "Processo de compra iniciado",
   compra_em_andamento: "Compra em andamento",
   negociacao: "Negociação",
@@ -136,14 +133,25 @@ export const STATUS_PRODUTO: Record<string, string> = {
 };
 
 export const TIPOS_PARCEIRO: Record<string, string> = {
-  canal_comercial: "Canal comercial",
-  revendedor_distribuidor: "Revendedor distribuidor",
-  revendedor_parceiro: "Revendedor parceiro",
-  parceiro_servico: "Parceiro de serviço",
-  consultor: "Consultor",
-  representante_regional: "Representante regional",
-  parceiro_institucional: "Parceiro institucional",
+  canal_comercial: "Canal Comercial",
+  revendedor_distribuidor: "Revendedor Distribuidor",
+  parceiro_servico: "Parceiro de Serviço",
 };
+
+// Definições combinadas com a DoisGe (chamado de 15/09/2026)
+export const DESCRICOES_TIPOS_PARCEIRO: Record<string, string> = {
+  canal_comercial: "Prospecta clientes, gera oportunidades e conduz negociações.",
+  revendedor_distribuidor:
+    "Compra a solução e comercializa diretamente ao órgão público. Além da venda, atua na implantação, suporte e atendimento.",
+  parceiro_servico:
+    "Executa atividades técnicas, treinamentos, consultorias e serviços especializados.",
+};
+
+/** Rótulo dos tipos de um parceiro (aceita a lista nova ou o campo antigo). */
+export function rotuloTiposParceiro(tipos: string[] | null | undefined, legado?: string | null) {
+  const lista = tipos && tipos.length > 0 ? tipos : legado ? [legado] : [];
+  return lista.map((t) => TIPOS_PARCEIRO[t] ?? t).join(" · ") || "—";
+}
 
 export const TIPOS_PRODUTO: Record<string, string> = {
   saas: "SaaS (software)",
@@ -263,17 +271,17 @@ export const GRUPOS_FUNIL: { chave: string; rotulo: string; etapas: string[] }[]
   {
     chave: "prospeccao",
     rotulo: "Prospecção",
-    etapas: ["lead_identificado", "oportunidade_cadastrada", "qualificacao_inicial", "diagnostico_da_dor"],
+    etapas: ["qualificacao_inicial"],
   },
   {
     chave: "apresentacao",
     rotulo: "Apresentação",
-    etapas: ["reuniao_realizada", "solucao_apresentada", "interesse_validado"],
+    etapas: ["reuniao_realizada", "solucao_apresentada"],
   },
   {
     chave: "proposta",
     rotulo: "Proposta",
-    etapas: ["proposta_solicitada", "proposta_enviada", "modelo_contratacao_definido"],
+    etapas: ["proposta_enviada"],
   },
   {
     chave: "licitacao",
@@ -433,6 +441,15 @@ export const STATUS_PROPOSTA_TRABALHO: Record<string, string> = {
   enviada: "Enviada",
   aceita: "Aceita",
   recusada: "Recusada",
+};
+
+// Quem recebe a comissão de uma regra (chamado de 15/09/2026)
+export const BENEFICIARIOS_COMISSAO: Record<string, string> = {
+  doisge: "DoisGe",
+  canal: "Canal (parceiro que vendeu)",
+  govtech: "GovTech (dona do produto)",
+  indicacao: "Indicação",
+  outro: "Outro",
 };
 
 export const PERFIS_DECISAO: Record<string, string> = {

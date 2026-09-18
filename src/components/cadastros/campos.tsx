@@ -52,6 +52,8 @@ export function CampoTexto({
           id={nome}
           name={nome}
           type={tipo}
+          // sem step, o navegador recusa centavos (R$ 14,90) em campos numéricos
+          step={tipo === "number" ? "any" : undefined}
           inputMode={inputMode}
           {...(controlado
             ? { value: valor, onChange: (e) => aoMudar(e.target.value) }

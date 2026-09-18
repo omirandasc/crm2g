@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
+import { BENEFICIARIOS_COMISSAO } from "@/lib/dominio";
 import type { ResultadoAcao } from "@/lib/acoes/cadastros";
 
 const texto = z
@@ -25,7 +26,7 @@ const esquemaRegra = z.object({
   produto_id: texto,
   parceiro_rede_id: texto,
   tipo_comissao: obrigatorio("Escolha o tipo de comissão."),
-  beneficiario: obrigatorio("Informe o beneficiário."),
+  beneficiario: z.enum(["doisge", "canal", "govtech", "indicacao", "outro"], { message: "Escolha o beneficiário." }),
   base_calculo: obrigatorio("Escolha a base de cálculo."),
   percentual: numero,
   valor_fixo: numero,
@@ -72,7 +73,7 @@ export async function calcularComissoesContrato(contratoId: string): Promise<Res
 
   const { data: contrato } = await supabase
     .from("contratos")
-    .select("id, produto_id, empresa_portfolio_id, parceiro_rede_id, valor_total, valor_mensal")
+    .select("id, produto_id, empresa_portfolio_id, parceiro_rede_id, valor_total, valor_mensal, parceiros_rede ( razao_social, nome_fantasia ), empresas_portfolio ( razao_social, nome_fantasia )")
     .eq("id", contratoId)
     .single();
 
@@ -116,6 +117,18 @@ export async function calcularComissoesContrato(contratoId: string): Promise<Res
     outro: null,
   };
 
+  // Beneficiário legível: o tipo da regra + o nome de quem recebe neste contrato
+  const nome = (e: unknown) => {
+    const x = e as { razao_social?: string; nome_fantasia?: string | null } | null;
+    return x?.nome_fantasia || x?.razao_social || null;
+  };
+  const nomeBeneficiario = (codigo: string) => {
+    const rotulo = BENEFICIARIOS_COMISSAO[codigo] ?? codigo;
+    if (codigo === "canal" && nome(contrato.parceiros_rede)) return `Canal — ${nome(contrato.parceiros_rede)}`;
+    if (codigo === "govtech" && nome(contrato.empresas_portfolio)) return `GovTech — ${nome(contrato.empresas_portfolio)}`;
+    return rotulo;
+  };
+
   let geradas = 0;
   for (const regra of aplicaveis) {
     const base = bases[regra.base_calculo] ?? null;
@@ -131,7 +144,7 @@ export async function calcularComissoesContrato(contratoId: string): Promise<Res
       produto_id: contrato.produto_id,
       empresa_portfolio_id: contrato.empresa_portfolio_id,
       parceiro_rede_id: contrato.parceiro_rede_id,
-      beneficiario: regra.beneficiario,
+      beneficiario: nomeBeneficiario(regra.beneficiario),
       valor_base: base,
       percentual: regra.percentual,
       valor_fixo: regra.valor_fixo,

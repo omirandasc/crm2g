@@ -111,7 +111,7 @@ export function FormOportunidade({
           nome="etapa_comercial"
           obrigatorio
           opcoes={ETAPAS_COMERCIAIS}
-          valorInicial={oportunidade?.etapa_comercial ?? "lead_identificado"}
+          valorInicial={oportunidade?.etapa_comercial ?? "qualificacao_inicial"}
         />
         <CampoTexto
           rotulo="Probabilidade (%)"

@@ -37,7 +37,7 @@ import {
 } from "@/lib/acoes/governanca";
 import { formatarMoeda } from "@/lib/utils";
 import type { Opcao } from "@/components/autorizacoes/autorizacoes-cliente";
-import type { TomPilula } from "@/lib/dominio";
+import { BENEFICIARIOS_COMISSAO, type TomPilula } from "@/lib/dominio";
 
 const TIPOS_COMISSAO: Record<string, string> = {
   comissao_doisge: "Comissão DOISGE",
@@ -169,7 +169,7 @@ export function ComissoesCliente({
       <SecaoFormulario titulo="Cálculo" />
       <div className="grid grid-cols-2 gap-3">
         <CampoSelecao rotulo="Tipo" nome="tipo_comissao" obrigatorio opcoes={TIPOS_COMISSAO} valorInicial={regra?.tipo_comissao ?? "comissao_parceiro"} />
-        <CampoTexto rotulo="Beneficiário" nome="beneficiario" obrigatorio valorInicial={regra?.beneficiario} placeholder="Ex.: DOISGE, Parceiro…" />
+        <CampoSelecao rotulo="Beneficiário (quem recebe)" nome="beneficiario" obrigatorio opcoes={BENEFICIARIOS_COMISSAO} valorInicial={regra?.beneficiario ?? "canal"} />
       </div>
       <div className="grid grid-cols-3 gap-3">
         <CampoSelecao rotulo="Base de cálculo" nome="base_calculo" obrigatorio opcoes={BASES_CALCULO} valorInicial={regra?.base_calculo ?? "valor_recebido"} />
@@ -312,7 +312,7 @@ export function ComissoesCliente({
                     <TableCell className="hidden sm:table-cell text-muted-foreground">
                       {r.produtos?.nome_produto ?? "Todos"} · {r.parceiros_rede?.nome_fantasia || r.parceiros_rede?.razao_social || "Todos"}
                     </TableCell>
-                    <TableCell>{r.beneficiario}</TableCell>
+                    <TableCell>{BENEFICIARIOS_COMISSAO[r.beneficiario] ?? r.beneficiario}</TableCell>
                     <TableCell className="hidden md:table-cell text-muted-foreground">
                       {BASES_CALCULO[r.base_calculo] ?? r.base_calculo}
                     </TableCell>

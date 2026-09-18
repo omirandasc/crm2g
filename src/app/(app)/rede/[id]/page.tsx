@@ -7,7 +7,7 @@ import type { SocioLinha, CertidaoLinha } from "@/components/cadastros/socios-ce
 import { Pilula } from "@/components/selo-territorio";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
-import { STATUS_PARCEIRO, TOM_STATUS_PARCEIRO, TIPOS_PARCEIRO } from "@/lib/dominio";
+import { STATUS_PARCEIRO, TOM_STATUS_PARCEIRO, rotuloTiposParceiro } from "@/lib/dominio";
 
 export const metadata = { title: "Canal" };
 
@@ -76,7 +76,7 @@ export default async function CanalDetalhePage({
             {parceiro.nome_fantasia || parceiro.razao_social}
           </h1>
           <p className="mt-0.5 text-sm text-muted-foreground">
-            Canal · {TIPOS_PARCEIRO[parceiro.tipo_parceiro] ?? parceiro.tipo_parceiro}
+            Canal · {rotuloTiposParceiro(parceiro.tipos_parceiro, parceiro.tipo_parceiro)}
             {(parceiro.ufs_credenciamento?.length
               ? ` · credenciado em ${parceiro.ufs_credenciamento.join(", ")}`
               : parceiro.uf_credenciamento
