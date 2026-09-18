@@ -11,13 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatarMoeda } from "@/lib/utils";
 import { GRUPOS_FUNIL, TIPOS_PRODUTO } from "@/lib/dominio";
 
@@ -197,22 +191,20 @@ export function RelatoriosCliente({
         ))}
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="space-y-2">
         <p className="text-sm text-muted-foreground">
           Escolha a visão para cruzar o funil por diferentes ângulos.
         </p>
-        <Select value={dimensao} onValueChange={(v) => setDimensao(v ?? "fase")} items={DIMENSOES}>
-          <SelectTrigger className="w-52">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
+        {/* Botões no lugar da caixa de seleção, como no Funil de vendas (chamado de 15/09) */}
+        <Tabs value={dimensao} onValueChange={(v) => setDimensao((v as string) ?? "fase")}>
+          <TabsList className="h-auto flex-wrap">
             {Object.entries(DIMENSOES).map(([valor, rotulo]) => (
-              <SelectItem key={valor} value={valor}>
+              <TabsTrigger key={valor} value={valor}>
                 {rotulo}
-              </SelectItem>
+              </TabsTrigger>
             ))}
-          </SelectContent>
-        </Select>
+          </TabsList>
+        </Tabs>
       </div>
 
       {oportunidades.length === 0 ? (
