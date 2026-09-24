@@ -19,6 +19,33 @@ const texto = z
 
 const obrigatorio = (msg: string) => z.string().trim().min(1, msg);
 
+type ErroBanco = { code?: string; message: string; details?: string | null; hint?: string | null };
+
+/**
+ * Traduz o erro do banco para uma frase clara e mantém uma pista técnica na
+ * tela. "Não foi possível salvar. Tente novamente." escondia a causa real —
+ * com o código à vista, um print do usuário já diz o que aconteceu.
+ */
+function erroAoSalvar(erro: ErroBanco, oQue: string): ResultadoAcao {
+  console.error(`[salvar ${oQue}]`, erro.code, erro.message, erro.details, erro.hint);
+
+  const frases: Record<string, string> = {
+    "23505": `Já existe ${oQue} cadastrado com esse CNPJ.`,
+    "23502": "Faltou preencher um campo obrigatório.",
+    "23503": "Há um vínculo inválido no formulário (registro relacionado não existe).",
+    "23514": "Os dados não passaram numa regra do banco — confira os campos marcados com *.",
+    "22001": "Algum campo ficou maior que o limite permitido (por exemplo, UF com mais de 2 letras).",
+    "42501": "Seu perfil não tem permissão para salvar este cadastro.",
+    PGRST204: "O sistema está numa versão anterior à do banco de dados. Avise o suporte: falta publicar a atualização.",
+  };
+
+  const frase = frases[erro.code ?? ""] ?? "Não foi possível salvar.";
+  return {
+    erro: `${frase} (código ${erro.code ?? "?"}: ${erro.message})`,
+    momento: Date.now(),
+  };
+}
+
 // ── GovTech ─────────────────────────────────────────
 const esquemaEmpresa = z.object({
   id: texto,
@@ -63,12 +90,7 @@ export async function salvarEmpresa(
     ? await supabase.from("empresas_portfolio").update(campos).eq("id", id)
     : await supabase.from("empresas_portfolio").insert(campos);
 
-  if (error) {
-    if (error.code === "23505") {
-      return { erro: "Já existe uma empresa cadastrada com esse CNPJ.", momento: Date.now() };
-    }
-    return { erro: "Não foi possível salvar. Tente novamente.", momento: Date.now() };
-  }
+  if (error) return erroAoSalvar(error, "uma GovTech");
 
   revalidatePath("/portfolio");
   revalidatePath("/painel");
@@ -109,9 +131,7 @@ export async function salvarProduto(
     ? await supabase.from("produtos").update(campos).eq("id", id)
     : await supabase.from("produtos").insert(campos);
 
-  if (error) {
-    return { erro: "Não foi possível salvar. Tente novamente.", momento: Date.now() };
-  }
+  if (error) return erroAoSalvar(error, "um produto");
 
   revalidatePath("/produtos");
   revalidatePath("/painel");
@@ -186,12 +206,7 @@ export async function salvarParceiro(
     ? await supabase.from("parceiros_rede").update(campos).eq("id", id)
     : await supabase.from("parceiros_rede").insert(campos);
 
-  if (error) {
-    if (error.code === "23505") {
-      return { erro: "Já existe um parceiro cadastrado com esse CNPJ.", momento: Date.now() };
-    }
-    return { erro: "Não foi possível salvar. Tente novamente.", momento: Date.now() };
-  }
+  if (error) return erroAoSalvar(error, "um canal");
 
   revalidatePath("/rede");
   revalidatePath("/painel");
