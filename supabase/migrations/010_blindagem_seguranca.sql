@@ -122,25 +122,39 @@ grant execute on function public.fn_minha_empresa() to authenticated;
 grant execute on function public.fn_meu_parceiro() to authenticated;
 grant execute on function public.fn_produto_autorizado(uuid) to authenticated;
 
--- Funções de gatilho não precisam ser chamáveis por ninguém pela API:
--- o Postgres as executa direto, sem checar EXECUTE.
-revoke execute on function public.fn_handle_new_user() from public, anon, authenticated;
-revoke execute on function public.fn_protege_acesso_profile() from public, anon, authenticated;
-revoke execute on function public.fn_registrar_historico() from public, anon, authenticated;
-revoke execute on function public.fn_numerar_proposta() from public, anon, authenticated;
-revoke execute on function public.fn_contrato_gera_area_exclusiva() from public, anon, authenticated;
-revoke execute on function public.fn_solicitacao_preco_oportunidade() from public, anon, authenticated;
-revoke execute on function public.fn_trava_preco_oportunidade() from public, anon, authenticated;
-revoke execute on function public.fn_oportunidade_empresa() from public, anon, authenticated;
-revoke execute on function public.fn_oportunidade_movimenta_area() from public, anon, authenticated;
-revoke execute on function public.fn_atividade_movimenta_area() from public, anon, authenticated;
-revoke execute on function public.fn_validar_limite_area_preferencial() from public, anon, authenticated;
-revoke execute on function public.fn_encerrar_exclusiva_com_contrato() from public, anon, authenticated;
-revoke execute on function public.fn_sincroniza_tipos_parceiro() from public, anon, authenticated;
-revoke execute on function public.fn_set_updated_at() from public, anon, authenticated;
+grant execute on function public.fn_gerar_parcelas(uuid) to service_role;
+grant execute on function public.fn_excluir_contrato(uuid) to service_role;
+grant execute on function public.fn_excluir_oportunidade(uuid) to service_role;
+grant execute on function public.fn_decidir_preco_oportunidade(uuid, text, boolean, text) to service_role;
+grant execute on function public.fn_e_doisge() to service_role;
+grant execute on function public.fn_e_doisge_leitura() to service_role;
+grant execute on function public.fn_meu_perfil() to service_role;
+grant execute on function public.fn_minha_empresa() to service_role;
+grant execute on function public.fn_meu_parceiro() to service_role;
+grant execute on function public.fn_produto_autorizado(uuid) to service_role;
 
--- Funções criadas daqui pra frente não nascem mais abertas.
-alter default privileges in schema public revoke execute on functions from public;
+-- Funções de gatilho: o Postgres as dispara sem checar EXECUTE, então tirar
+-- da chave pública não muda nada no funcionamento. Os demais papéis ficam
+-- como estão (chamar gatilho pela API já dá erro por natureza).
+revoke execute on function public.fn_handle_new_user() from public, anon;
+revoke execute on function public.fn_protege_acesso_profile() from public, anon;
+revoke execute on function public.fn_registrar_historico() from public, anon;
+revoke execute on function public.fn_numerar_proposta() from public, anon;
+revoke execute on function public.fn_contrato_gera_area_exclusiva() from public, anon;
+revoke execute on function public.fn_solicitacao_preco_oportunidade() from public, anon;
+revoke execute on function public.fn_trava_preco_oportunidade() from public, anon;
+revoke execute on function public.fn_oportunidade_empresa() from public, anon;
+revoke execute on function public.fn_oportunidade_movimenta_area() from public, anon;
+revoke execute on function public.fn_atividade_movimenta_area() from public, anon;
+revoke execute on function public.fn_validar_limite_area_preferencial() from public, anon;
+revoke execute on function public.fn_encerrar_exclusiva_com_contrato() from public, anon;
+revoke execute on function public.fn_sincroniza_tipos_parceiro() from public, anon;
+revoke execute on function public.fn_set_updated_at() from public, anon;
+
+-- O Supabase concede EXECUTE a anon em toda função nova criada pelo postgres.
+-- Daqui pra frente a chave pública não ganha mais esse acesso automático;
+-- authenticated e service_role continuam recebendo como antes.
+alter default privileges for role postgres in schema public revoke execute on functions from anon;
 
 -- ── 5) search_path fixo (aviso do linter do Supabase) ───────────
 -- Sem isso, quem controla o search_path da sessão pode fazer a função
