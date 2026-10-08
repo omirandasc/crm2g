@@ -29,19 +29,22 @@ export function CampoMunicipio({
   obrigatorio,
   valorInicial,
   ufs,
+  aoEscolher,
 }: {
   rotulo?: string;
   nome: string;
   obrigatorio?: boolean;
-  valorInicial?: { id: string; nome: string; uf: string } | null;
+  valorInicial?: { id: string; nome: string; uf: string; populacao?: number | null } | null;
   /** Restringe a busca a estas UFs (ex.: UFs de credenciamento do Canal). */
   ufs?: string[] | null;
+  /** Chamado quando o usuário escolhe uma cidade (ex.: calcular preço pela população). */
+  aoEscolher?: (municipio: Municipio) => void;
 }) {
   const [aberto, setAberto] = React.useState(false);
   const [busca, setBusca] = React.useState("");
   const [opcoes, setOpcoes] = React.useState<Municipio[]>([]);
   const [escolhido, setEscolhido] = React.useState<Municipio | null>(
-    valorInicial ? { ...valorInicial, populacao: null } : null
+    valorInicial ? { ...valorInicial, populacao: valorInicial.populacao ?? null } : null
   );
 
   React.useEffect(() => {
@@ -108,6 +111,7 @@ export function CampoMunicipio({
                     onSelect={() => {
                       setEscolhido(m);
                       setAberto(false);
+                      aoEscolher?.(m);
                     }}
                   >
                     <Check

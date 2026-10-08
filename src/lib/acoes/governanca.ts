@@ -291,6 +291,45 @@ export async function decidirSolicitacao(
     data: { user },
   } = await supabase.auth.getUser();
 
+  // Exceção de preço aberta pelo gatilho da oportunidade: a decisão passa
+  // pela função do banco, que registra o lado da DoisGe e só fecha a
+  // solicitação quando a GovTech também aprovar.
+  const { data: solicitacao } = await supabase
+    .from("solicitacoes_aprovacao")
+    .select("tipo_solicitacao, entidade, entidade_id")
+    .eq("id", solicitacaoId)
+    .maybeSingle();
+
+  if (
+    solicitacao?.tipo_solicitacao === "excecao_preco" &&
+    solicitacao.entidade === "oportunidades" &&
+    solicitacao.entidade_id &&
+    decisao !== "devolvida_para_ajuste"
+  ) {
+    const { data: resultado, error: erroRpc } = await supabase.rpc("fn_decidir_preco_oportunidade", {
+      p_oportunidade: solicitacao.entidade_id,
+      p_lado: "doisge",
+      p_aprovar: decisao === "aprovada",
+      p_motivo: motivo ?? null,
+    });
+    if (erroRpc) return { erro: erroRpc.message, momento: Date.now() };
+
+    if (resultado === "pendente") {
+      await supabase
+        .from("solicitacoes_aprovacao")
+        .update({
+          status: "em_analise",
+          motivo_decisao: `Aprovado pela DoisGe em ${new Date().toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" })}; aguardando a GovTech.`,
+        })
+        .eq("id", solicitacaoId);
+    }
+
+    revalidatePath("/aprovacoes");
+    revalidatePath("/oportunidades");
+    revalidatePath(`/oportunidades/${solicitacao.entidade_id}`);
+    return { ok: true, momento: Date.now() };
+  }
+
   const { error } = await supabase
     .from("solicitacoes_aprovacao")
     .update({

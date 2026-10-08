@@ -25,6 +25,7 @@ import { Separator } from "@/components/ui/separator";
 import { Pilula } from "@/components/selo-territorio";
 import { PainelFormulario } from "@/components/cadastros/painel-formulario";
 import { CampoTextoLongo, CampoSelecao } from "@/components/cadastros/campos";
+import Link from "next/link";
 import { criarSolicitacao, decidirSolicitacao } from "@/lib/acoes/governanca";
 import { formatarData } from "@/lib/utils";
 import type { TomPilula } from "@/lib/dominio";
@@ -64,6 +65,8 @@ const TOM_SOLICITACAO: Record<string, TomPilula> = {
 export type SolicitacaoLinha = {
   id: string;
   tipo_solicitacao: string;
+  entidade: string | null;
+  entidade_id: string | null;
   descricao: string | null;
   status: string;
   data_solicitacao: string;
@@ -179,6 +182,17 @@ export function AprovacoesCliente({ solicitacoes }: { solicitacoes: SolicitacaoL
                 </Pilula>
 
                 {detalhe.descricao && <p className="text-sm">{detalhe.descricao}</p>}
+
+                {detalhe.entidade === "oportunidades" && detalhe.entidade_id && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    nativeButton={false}
+                    render={<Link href={`/oportunidades/${detalhe.entidade_id}`} />}
+                  >
+                    Abrir a oportunidade
+                  </Button>
+                )}
                 {detalhe.motivo_decisao && (
                   <p className="rounded-lg bg-muted px-3 py-2.5 text-sm">
                     <span className="font-medium">Decisão:</span> {detalhe.motivo_decisao}

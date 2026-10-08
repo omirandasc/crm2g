@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import type { ResultadoAcao } from "@/lib/acoes/cadastros";
+import { calcularTabela, type PrecoVigente } from "@/lib/precos";
 
 const texto = z
   .string()
@@ -303,6 +304,10 @@ const esquemaOportunidade = z.object({
   etapa_comercial: obrigatorio("Escolha a etapa."),
   valor_tabela: numero,
   valor_venda: numero,
+  quantidade: z.preprocess(
+    (v) => (v === "" || v == null ? null : Number(v)),
+    z.number().int().positive("A quantidade precisa ser maior que zero.").nullable()
+  ),
   probabilidade: z.preprocess(
     (v) => (v === "" || v == null ? null : Number(v)),
     z.number().int().min(0).max(100).nullable()
@@ -324,17 +329,28 @@ export async function salvarOportunidade(
   }
 
   const { id, ...campos } = dados.data;
+  const supabase = await createClient();
 
-  // Trava de preço: venda não pode ficar abaixo da tabela
-  if (
-    campos.valor_venda != null &&
-    campos.valor_tabela != null &&
-    campos.valor_venda < campos.valor_tabela
-  ) {
-    return {
-      erro: "O valor de venda está abaixo do valor de tabela. Ajuste o valor ou solicite exceção à Governança.",
-      momento: Date.now(),
-    };
+  // O valor de tabela é recalculado aqui, pela tabela do produto e pela
+  // população da cidade — o que veio do formulário só vale para produto sem
+  // tabela cadastrada. Venda abaixo da tabela não é recusada: o gatilho do
+  // banco trava a oportunidade e abre o pedido de aprovação à DoisGe/GovTech.
+  const [{ data: precos }, { data: municipio }] = await Promise.all([
+    supabase.rpc("fn_precos_vigentes"),
+    supabase.from("municipios").select("populacao").eq("id", campos.municipio_id).maybeSingle(),
+  ]);
+  const tabela = calcularTabela(
+    (precos ?? []) as PrecoVigente[],
+    campos.produto_id,
+    municipio?.populacao ?? null,
+    campos.quantidade
+  );
+  if (tabela.modo === "unidade" && !campos.quantidade) {
+    return { erro: "Informe a quantidade para calcular o valor deste produto.", momento: Date.now() };
+  }
+  if (tabela.modo !== "sem_tabela") campos.valor_tabela = tabela.valor;
+  if (campos.valor_venda == null && campos.valor_tabela != null) {
+    campos.valor_venda = campos.valor_tabela;
   }
 
   // Status acompanha a etapa final
@@ -346,8 +362,6 @@ export async function salvarOportunidade(
         : campos.etapa_comercial === "suspenso"
           ? "suspensa"
           : "em_andamento";
-
-  const supabase = await createClient();
 
   const { error } = id
     ? await supabase.from("oportunidades").update({ ...campos, status }).eq("id", id)
@@ -366,4 +380,26 @@ export async function salvarOportunidade(
   revalidatePath("/oportunidades");
   revalidatePath("/painel");
   return { ok: true, momento: Date.now() };
+}
+
+// ── Aprovação de preço abaixo da tabela (DoisGe e GovTech) ──────
+export async function decidirPrecoOportunidade(
+  oportunidadeId: string,
+  lado: "doisge" | "govtech",
+  aprovar: boolean,
+  motivo?: string
+): Promise<ResultadoAcao & { resultado?: string }> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("fn_decidir_preco_oportunidade", {
+    p_oportunidade: oportunidadeId,
+    p_lado: lado,
+    p_aprovar: aprovar,
+    p_motivo: motivo ?? null,
+  });
+  if (error) return { erro: error.message, momento: Date.now() };
+
+  revalidatePath(`/oportunidades/${oportunidadeId}`);
+  revalidatePath("/oportunidades");
+  revalidatePath("/aprovacoes");
+  return { ok: true, momento: Date.now(), resultado: data as string };
 }

@@ -12,7 +12,7 @@ export default async function AprovacoesPage() {
   const { data: solicitacoes } = await supabase
     .from("solicitacoes_aprovacao")
     .select(
-      "id, tipo_solicitacao, descricao, status, data_solicitacao, data_decisao, motivo_decisao, profiles!solicitacoes_solicitante_fkey ( nome )"
+      "id, tipo_solicitacao, entidade, entidade_id, descricao, status, data_solicitacao, data_decisao, motivo_decisao, profiles!solicitacoes_solicitante_fkey ( nome )"
     )
     .order("data_solicitacao", { ascending: false });
 

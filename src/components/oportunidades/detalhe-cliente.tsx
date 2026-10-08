@@ -25,7 +25,9 @@ import {
   FormOportunidade,
   type OportunidadeLinha,
 } from "@/components/oportunidades/funil-cliente";
+import { AprovacaoPreco } from "@/components/oportunidades/aprovacao-preco";
 import type { Opcao } from "@/components/autorizacoes/autorizacoes-cliente";
+import type { PrecoVigente } from "@/lib/precos";
 import {
   TIPOS_ATIVIDADE,
   VISIBILIDADES_ATIVIDADE,
@@ -118,10 +120,16 @@ export function DetalheOportunidade({
   contatos,
   produtos,
   parceiros,
+  precos,
+  podeAprovarDoisge,
+  podeAprovarGovtech,
 }: {
   oportunidade: OportunidadeLinha & {
     orgao_publico_id: string | null;
     orgao_faturado_id: string | null;
+    preco_aprov_doisge_em?: string | null;
+    preco_aprov_govtech_em?: string | null;
+    preco_motivo_recusa?: string | null;
   };
   atividades: Atividade[];
   propostas: Proposta[];
@@ -131,6 +139,9 @@ export function DetalheOportunidade({
   contatos: ContatoPublico[];
   produtos: Opcao[];
   parceiros: Opcao[];
+  precos: PrecoVigente[];
+  podeAprovarDoisge: boolean;
+  podeAprovarGovtech: boolean;
 }) {
   const [novoOrgaoAberto, setNovoOrgaoAberto] = React.useState(false);
   const [propostaAberta, setPropostaAberta] = React.useState(false);
@@ -199,6 +210,7 @@ export function DetalheOportunidade({
                   oportunidade={oportunidade}
                   produtos={produtos}
                   parceiros={parceiros}
+                  precos={precos}
                 />
               </div>
             </FormAcao>
@@ -206,6 +218,19 @@ export function DetalheOportunidade({
         </Card>
 
         <div className="space-y-4">
+        {oportunidade.preco_aprovacao_status && (
+          <AprovacaoPreco
+            oportunidadeId={oportunidade.id}
+            status={oportunidade.preco_aprovacao_status}
+            valorTabela={oportunidade.valor_tabela}
+            valorVenda={oportunidade.valor_venda}
+            doisgeEm={oportunidade.preco_aprov_doisge_em ?? null}
+            govtechEm={oportunidade.preco_aprov_govtech_em ?? null}
+            motivoRecusa={oportunidade.preco_motivo_recusa ?? null}
+            podeDoisge={podeAprovarDoisge}
+            podeGovtech={podeAprovarGovtech}
+          />
+        )}
         <Card>
           <CardHeader>
             <CardTitle>Órgão e faturamento</CardTitle>

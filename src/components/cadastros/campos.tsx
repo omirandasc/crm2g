@@ -101,6 +101,7 @@ export function CampoSelecao({
   obrigatorio,
   permitirVazio,
   rotuloVazio = "— Nenhum —",
+  aoMudar,
 }: {
   rotulo: string;
   nome: string;
@@ -109,6 +110,8 @@ export function CampoSelecao({
   obrigatorio?: boolean;
   permitirVazio?: boolean;
   rotuloVazio?: string;
+  /** Avisa quem está fora quando a escolha muda (ex.: recalcular preço). */
+  aoMudar?: (valor: string) => void;
 }) {
   return (
     <div className="space-y-1.5">
@@ -121,6 +124,7 @@ export function CampoSelecao({
         items={permitirVazio ? { "": rotuloVazio, ...opcoes } : opcoes}
         defaultValue={valorInicial ?? (permitirVazio ? "" : undefined)}
         required={obrigatorio}
+        onValueChange={aoMudar ? (v) => aoMudar(String(v ?? "")) : undefined}
       >
         <SelectTrigger id={nome} className="w-full">
           <SelectValue placeholder="Escolher…" />

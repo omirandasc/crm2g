@@ -4,22 +4,25 @@ import {
   type OportunidadeLinha,
 } from "@/components/oportunidades/funil-cliente";
 import type { Opcao } from "@/components/autorizacoes/autorizacoes-cliente";
+import type { PrecoVigente } from "@/lib/precos";
 
 export const metadata = { title: "Funil de vendas" };
 
 export default async function OportunidadesPage() {
   const supabase = await createClient();
 
-  const [{ data: oportunidades }, { data: produtos }, { data: parceiros }] =
+  const [{ data: oportunidades }, { data: produtos }, { data: parceiros }, { data: precos }] =
     await Promise.all([
       supabase
         .from("oportunidades")
         .select(
-          "id, codigo, nome_oportunidade, produto_id, parceiro_rede_id, municipio_id, origem, etapa_comercial, status, valor_tabela, valor_venda, probabilidade, previsao_fechamento, dor_identificada, proximo_passo, data_proximo_passo, observacoes, produtos ( nome_produto ), parceiros_rede ( razao_social, nome_fantasia ), municipios ( id, nome, uf )"
+          "id, codigo, nome_oportunidade, produto_id, parceiro_rede_id, municipio_id, origem, etapa_comercial, status, valor_tabela, valor_venda, quantidade, preco_aprovacao_status, probabilidade, previsao_fechamento, dor_identificada, proximo_passo, data_proximo_passo, observacoes, produtos ( nome_produto, empresa_portfolio_id, empresas_portfolio ( razao_social, nome_fantasia ) ), parceiros_rede ( razao_social, nome_fantasia ), municipios ( id, nome, uf, populacao )"
         )
         .order("updated_at", { ascending: false }),
       supabase.from("produtos").select("id, nome_produto").order("nome_produto"),
       supabase.from("parceiros_rede").select("id, razao_social, nome_fantasia").order("razao_social"),
+      // tabela de preços vigente (só dos produtos que este usuário pode vender)
+      supabase.rpc("fn_precos_vigentes"),
     ]);
 
   return (
@@ -38,6 +41,7 @@ export default async function OportunidadesPage() {
           id: p.id,
           rotulo: p.nome_fantasia || p.razao_social,
         })) as Opcao[]}
+        precos={(precos ?? []) as PrecoVigente[]}
       />
     </div>
   );

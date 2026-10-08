@@ -4,10 +4,11 @@ import { createClient } from "@/lib/supabase/server";
 import { DetalheOportunidade } from "@/components/oportunidades/detalhe-cliente";
 import type { OportunidadeLinha } from "@/components/oportunidades/funil-cliente";
 import type { Opcao } from "@/components/autorizacoes/autorizacoes-cliente";
+import type { PrecoVigente } from "@/lib/precos";
 import { Pilula } from "@/components/selo-territorio";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
-import { ETAPAS_COMERCIAIS, TOM_ETAPA } from "@/lib/dominio";
+import { ETAPAS_COMERCIAIS, TOM_ETAPA, ehDoisge } from "@/lib/dominio";
 import { formatarMoeda } from "@/lib/utils";
 
 export const metadata = { title: "Oportunidade" };
@@ -23,21 +24,28 @@ export default async function OportunidadeDetalhePage({
   const { data: oportunidade } = await supabase
     .from("oportunidades")
     .select(
-      "*, produtos ( nome_produto ), parceiros_rede ( razao_social, nome_fantasia ), municipios ( id, nome, uf )"
+      "*, produtos ( nome_produto, empresa_portfolio_id ), parceiros_rede ( razao_social, nome_fantasia ), municipios ( id, nome, uf, populacao )"
     )
     .eq("id", id)
     .single();
 
   if (!oportunidade) notFound();
 
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   const [
+    { data: perfil },
     { data: atividades },
     { data: propostas },
     { data: processo },
     { data: produtos },
     { data: parceiros },
     { data: orgaos },
+    { data: precos },
   ] = await Promise.all([
+    supabase.from("profiles").select("perfil, empresa_portfolio_id").eq("id", user!.id).single(),
     supabase
       .from("atividades_comerciais")
       .select("id, tipo_atividade, data_atividade, descricao, proximo_passo, data_proximo_passo, visibilidade")
@@ -60,6 +68,7 @@ export default async function OportunidadeDetalhePage({
       .select("id, nome_orgao, tipo_orgao")
       .eq("municipio_id", oportunidade.municipio_id)
       .order("nome_orgao"),
+    supabase.rpc("fn_precos_vigentes"),
   ]);
 
   const { data: contatos } = oportunidade.orgao_publico_id
@@ -78,6 +87,15 @@ export default async function OportunidadeDetalhePage({
         .order("created_at", { ascending: false })
     : { data: [] };
 
+  // Quem pode aprovar o preço abaixo da tabela: a DoisGe (e ela também pode
+  // registrar a aprovação da GovTech, para fabricantes sem acesso ao CRM) e a
+  // própria GovTech dona do produto.
+  const souDoisge = ehDoisge(perfil?.perfil);
+  const podeAprovarGovtech =
+    souDoisge ||
+    (!!perfil?.empresa_portfolio_id &&
+      perfil.empresa_portfolio_id === oportunidade.produtos?.empresa_portfolio_id);
+
   return (
     <div className="max-w-6xl space-y-5">
       <div className="flex flex-wrap items-center gap-3">
@@ -94,10 +112,13 @@ export default async function OportunidadeDetalhePage({
             {oportunidade.parceiros_rede?.nome_fantasia || oportunidade.parceiros_rede?.razao_social || "DOISGE"}
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2">
           <span className="font-mono text-lg font-semibold tabular-nums">
             {formatarMoeda(oportunidade.valor_venda)}
           </span>
+          {oportunidade.preco_aprovacao_status === "pendente" && (
+            <Pilula tom="alerta">Preço em aprovação</Pilula>
+          )}
           <Pilula tom={TOM_ETAPA[oportunidade.etapa_comercial] ?? "neutro"}>
             {ETAPAS_COMERCIAIS[oportunidade.etapa_comercial] ?? oportunidade.etapa_comercial}
           </Pilula>
@@ -117,6 +138,9 @@ export default async function OportunidadeDetalhePage({
           id: p.id,
           rotulo: p.nome_fantasia || p.razao_social,
         })) as Opcao[]}
+        precos={(precos ?? []) as PrecoVigente[]}
+        podeAprovarDoisge={souDoisge}
+        podeAprovarGovtech={podeAprovarGovtech}
       />
     </div>
   );
