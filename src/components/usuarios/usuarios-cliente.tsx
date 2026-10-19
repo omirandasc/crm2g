@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Plus, UsersRound } from "lucide-react";
+import { Plus, UsersRound, Wand2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
@@ -45,6 +45,40 @@ function iniciais(nome?: string | null) {
   if (!nome) return "?";
   const partes = nome.trim().split(/\s+/);
   return (partes[0][0] + (partes[1]?.[0] ?? "")).toUpperCase();
+}
+
+// Sem 0/O, 1/l/I: a senha vai ser ditada por telefone ou copiada do WhatsApp.
+const ALFABETO_SENHA = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789";
+
+function gerarSenha(tamanho = 12) {
+  const aleatorios = new Uint32Array(tamanho);
+  crypto.getRandomValues(aleatorios);
+  return Array.from(aleatorios, (n) => ALFABETO_SENHA[n % ALFABETO_SENHA.length]).join("");
+}
+
+function CampoSenhaInicial() {
+  const [senha, setSenha] = React.useState("");
+  return (
+    <div className="space-y-1.5">
+      <CampoTexto
+        rotulo="Senha inicial"
+        nome="senha"
+        obrigatorio
+        valor={senha}
+        aoMudar={setSenha}
+        placeholder="Mínimo de 8 caracteres"
+      />
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-xs text-muted-foreground">
+          Envie à pessoa e oriente a trocar no primeiro acesso (menu do canto → Alterar minha senha).
+        </p>
+        <Button type="button" variant="outline" size="sm" onClick={() => setSenha(gerarSenha())}>
+          <Wand2 className="size-3.5" />
+          Gerar
+        </Button>
+      </div>
+    </div>
+  );
 }
 
 export function UsuariosCliente({
@@ -151,7 +185,7 @@ export function UsuariosCliente({
         <SecaoFormulario titulo="Identificação" />
         <CampoTexto rotulo="Nome" nome="nome" obrigatorio />
         <CampoTexto rotulo="E-mail" nome="email" tipo="email" obrigatorio />
-        <CampoTexto rotulo="Senha inicial" nome="senha" obrigatorio placeholder="Mínimo de 8 caracteres" />
+        <CampoSenhaInicial />
         <SecaoFormulario titulo="Acesso" />
         <CampoSelecao rotulo="Perfil" nome="perfil" obrigatorio opcoes={PERFIS} valorInicial="usuario_rede" />
         <CamposVinculo />

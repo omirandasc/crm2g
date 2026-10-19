@@ -29,9 +29,13 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const isLogin = request.nextUrl.pathname.startsWith("/login");
+  const caminho = request.nextUrl.pathname;
+  const isLogin = caminho.startsWith("/login");
+  // Telas que precisam abrir sem sessão: pedir o link de senha e o próprio
+  // link do e-mail (que é quem cria a sessão).
+  const publica = isLogin || caminho.startsWith("/esqueci-senha") || caminho.startsWith("/auth/");
 
-  if (!user && !isLogin) {
+  if (!user && !publica) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);

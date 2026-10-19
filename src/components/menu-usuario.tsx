@@ -1,6 +1,7 @@
 "use client";
 
-import { LogOut, UserRound } from "lucide-react";
+import * as React from "react";
+import { KeyRound, LogOut, UserRound } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -12,7 +13,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import { PainelFormulario } from "@/components/cadastros/painel-formulario";
+import { CampoTexto } from "@/components/cadastros/campos";
 import { sair } from "@/app/login/actions";
+import { alterarMinhaSenha } from "@/lib/acoes/senha";
 
 function iniciais(nome?: string | null) {
   if (!nome) return "?";
@@ -29,45 +33,68 @@ export function MenuUsuario({
   email: string | null;
   perfilRotulo: string;
 }) {
+  const [senhaAberta, setSenhaAberta] = React.useState(false);
+
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger
-        render={
-          <Button variant="ghost" className="gap-2.5 px-2">
-            <Avatar className="size-7">
-              <AvatarFallback className="bg-marca-100 text-marca-800 text-xs font-semibold">
-                {iniciais(nome)}
-              </AvatarFallback>
-            </Avatar>
-            <span className="hidden md:block text-left">
-              <span className="block text-sm font-medium leading-tight">{nome}</span>
-              <span className="block text-xs text-muted-foreground leading-tight">
-                {perfilRotulo}
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger
+          render={
+            <Button variant="ghost" className="gap-2.5 px-2">
+              <Avatar className="size-7">
+                <AvatarFallback className="bg-marca-100 text-marca-800 text-xs font-semibold">
+                  {iniciais(nome)}
+                </AvatarFallback>
+              </Avatar>
+              <span className="hidden md:block text-left">
+                <span className="block text-sm font-medium leading-tight">{nome}</span>
+                <span className="block text-xs text-muted-foreground leading-tight">
+                  {perfilRotulo}
+                </span>
+              </span>
+            </Button>
+          }
+        />
+        <DropdownMenuContent align="end" className="w-60">
+          <DropdownMenuGroup>
+          <DropdownMenuLabel>
+            <span className="flex items-center gap-2">
+              <UserRound className="size-4 text-muted-foreground" />
+              <span className="min-w-0">
+                <span className="block truncate">{nome}</span>
+                <span className="block truncate text-xs font-normal text-muted-foreground">
+                  {email}
+                </span>
               </span>
             </span>
-          </Button>
-        }
-      />
-      <DropdownMenuContent align="end" className="w-60">
-        <DropdownMenuGroup>
-        <DropdownMenuLabel>
-          <span className="flex items-center gap-2">
-            <UserRound className="size-4 text-muted-foreground" />
-            <span className="min-w-0">
-              <span className="block truncate">{nome}</span>
-              <span className="block truncate text-xs font-normal text-muted-foreground">
-                {email}
-              </span>
-            </span>
-          </span>
-        </DropdownMenuLabel>
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem variant="destructive" onClick={() => sair()}>
-          <LogOut className="size-4" />
-          Sair da conta
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+          </DropdownMenuLabel>
+          </DropdownMenuGroup>
+          <DropdownMenuSeparator />
+          <DropdownMenuGroup>
+            <DropdownMenuItem onClick={() => setSenhaAberta(true)}>
+              <KeyRound className="size-4" />
+              Alterar minha senha
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem variant="destructive" onClick={() => sair()}>
+            <LogOut className="size-4" />
+            Sair da conta
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <PainelFormulario
+        aberto={senhaAberta}
+        aoFechar={() => setSenhaAberta(false)}
+        titulo="Alterar minha senha"
+        descricao="Confirme a senha atual e escolha uma nova com pelo menos 8 caracteres."
+        acao={alterarMinhaSenha}
+      >
+        <CampoTexto rotulo="Senha atual" nome="senha_atual" tipo="password" obrigatorio />
+        <CampoTexto rotulo="Nova senha" nome="nova_senha" tipo="password" obrigatorio placeholder="Mínimo de 8 caracteres" />
+        <CampoTexto rotulo="Confirmar a nova senha" nome="confirmar_senha" tipo="password" obrigatorio />
+      </PainelFormulario>
+    </>
   );
 }

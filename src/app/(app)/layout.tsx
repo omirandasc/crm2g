@@ -26,8 +26,10 @@ export default async function AppLayout({
     .eq("id", user.id)
     .single();
 
+  // Acesso inativo: encerra a sessão (senão o login mandaria de volta para
+  // cá, em loop) e explica o motivo na tela de entrada.
   if (!perfil || perfil.status !== "ativo") {
-    redirect("/login");
+    redirect("/auth/sair?motivo=inativo");
   }
 
   return (

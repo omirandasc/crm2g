@@ -36,9 +36,21 @@ async function chamarFuncaoAdmin(corpo: Record<string, unknown>) {
   return (await resposta.json()) as { ok?: boolean; erro?: string };
 }
 
+// Erros do Supabase Auth chegam em inglês; os mais comuns ganham tradução.
+function traduzirErroAuth(mensagem?: string) {
+  if (!mensagem) return "Não foi possível criar o usuário.";
+  if (/already (been )?registered|already exists/i.test(mensagem)) return "Já existe um usuário com esse e-mail.";
+  if (/invalid.*email|email.*invalid/i.test(mensagem)) return "O e-mail informado não é válido.";
+  if (/weak|pwned|leaked|compromised/i.test(mensagem)) {
+    return "Essa senha apareceu em vazamentos conhecidos. Escolha outra, mais difícil de adivinhar.";
+  }
+  if (/at least/i.test(mensagem)) return "A senha precisa de pelo menos 8 caracteres.";
+  return `Não foi possível concluir (${mensagem}).`;
+}
+
 const esquemaNovoUsuario = z.object({
   nome: obrigatorio("Informe o nome."),
-  email: obrigatorio("Informe o e-mail."),
+  email: obrigatorio("Informe o e-mail.").transform((v) => v.toLowerCase()),
   senha: z.string().min(8, "A senha precisa de pelo menos 8 caracteres."),
   perfil: obrigatorio("Escolha o perfil."),
   empresa_portfolio_id: texto,
@@ -62,7 +74,7 @@ export async function criarUsuario(
   }
 
   const r = await chamarFuncaoAdmin({ acao: "criar", ...dados.data });
-  if (!r.ok) return { erro: r.erro ?? "Não foi possível criar o usuário.", momento: Date.now() };
+  if (!r.ok) return { erro: traduzirErroAuth(r.erro), momento: Date.now() };
 
   revalidatePath("/usuarios");
   return { ok: true, momento: Date.now() };
@@ -106,7 +118,7 @@ export async function editarUsuario(
       return { erro: "A nova senha precisa de pelo menos 8 caracteres.", momento: Date.now() };
     }
     const r = await chamarFuncaoAdmin({ acao: "redefinir_senha", usuario_id: id, senha: nova_senha });
-    if (!r.ok) return { erro: r.erro ?? "Perfil salvo, mas a senha não foi alterada.", momento: Date.now() };
+    if (!r.ok) return { erro: `Perfil salvo, mas a senha não foi alterada. ${traduzirErroAuth(r.erro)}`, momento: Date.now() };
   }
 
   revalidatePath("/usuarios");
